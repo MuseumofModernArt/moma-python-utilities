@@ -1,0 +1,16 @@
+[project]
+name = "moma"
+version = "0.0.1"
+authors = [
+  { name="John Halderman", email="john_halderman@moma.org" },
+]
+description = "Shared utilities for Cloud/AI applications"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
