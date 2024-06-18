@@ -2,8 +2,9 @@ import openai
 import os
 
 OPENAI_API_KEY=os.getenv('OPENAI_API_KEY_ENV')
+DEFAULT_MODEL="gpt-4o"
 
-def gpt4_getdesc(prompt_txt, base64_image, api_key=None, model="gpt-4o"):
+def gpt4_getdesc(prompt_txt, base64_image, api_key=None, model=DEFAULT_MODEL):
     image_desc=""
         
     if base64_image is None:

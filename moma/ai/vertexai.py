@@ -2,7 +2,9 @@ import os
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, Image
 
-def gemini_getdesc(short_prompt_txt, image_path, model="gemini-1.0-pro-vision"):
+DEFAULT_MODEL="gemini-1.0-pro-vision"
+
+def gemini_getdesc(short_prompt_txt, image_path, model=DEFAULT_MODEL):
     PROJECT_ID = "moma-dw"
     REGION = "us-central1"
 
