@@ -2,7 +2,7 @@ import os
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, Image
 
-def gemini_getdesc(short_prompt_txt, image_path):
+def gemini_getdesc(short_prompt_txt, image_path, model="gemini-1.0-pro-vision"):
     PROJECT_ID = "moma-dw"
     REGION = "us-central1"
 
@@ -26,7 +26,7 @@ def gemini_getdesc(short_prompt_txt, image_path):
         # If image is a file (not URL) load image directly
         image = Image.load_from_file(IMAGE_FILE)
 
-        generative_multimodal_model = GenerativeModel("gemini-1.0-pro-vision")
+        generative_multimodal_model = GenerativeModel(model)
         response = generative_multimodal_model.generate_content([short_prompt_txt, image])
     
 

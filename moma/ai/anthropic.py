@@ -3,7 +3,7 @@ import os
 
 ANTHROPIC_API_KEY=os.getenv("ANTHROPIC_API_KEY_ENV")
 
-def claude_getdesc(short_prompt_txt, base64_image, api_key=None):
+def claude_getdesc(short_prompt_txt, base64_image, api_key=None, model="claude-3-opus-20240229"):
     try:
         if api_key is None:
             api_key = ANTHROPIC_API_KEY
@@ -11,7 +11,7 @@ def claude_getdesc(short_prompt_txt, base64_image, api_key=None):
         client = anthropic.Anthropic(api_key=api_key)
 
         message = client.messages.create(
-            model="claude-3-opus-20240229",
+            model=model,
             max_tokens=1024,
             messages=[
                 {
