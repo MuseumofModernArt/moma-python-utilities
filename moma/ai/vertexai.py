@@ -5,6 +5,12 @@ from vertexai.preview.generative_models import GenerativeModel, Image
 DEFAULT_MODEL="gemini-1.0-pro-vision"
 
 def gemini_getdesc(short_prompt_txt, image_path, model=DEFAULT_MODEL):
+    text, error = gemini_getdesc_with_error(short_prompt_txt, image_path, model)
+    if text is None:
+        return error
+    return text
+
+def gemini_getdesc_with_error(short_prompt_txt, image_path, model=DEFAULT_MODEL):
     PROJECT_ID = "moma-dw"
     REGION = "us-central1"
 
@@ -34,12 +40,12 @@ def gemini_getdesc(short_prompt_txt, image_path, model=DEFAULT_MODEL):
 
         #print(response)
         # Assuming 'candidates', 'content', and 'parts' are lists
-        text_content=""
+        text_content=None
         for candidate in response.candidates:
             for part in candidate.content.parts:
                 text_content = part.text
                 #print(text_content)
-                return(text_content)
+                return text_content, None
         
     except Exception as e:
-        return  f"ERROR: Gemini failed to process: {e}"
+        return  None, f"ERROR: Gemini failed to process: {e}"
