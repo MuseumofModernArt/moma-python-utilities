@@ -1,0 +1,2 @@
+AUTOENV_ENABLE_LEAVE=1
+source ".venv/bin/activate"

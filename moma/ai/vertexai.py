@@ -1,4 +1,3 @@
-import os
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, Image
 

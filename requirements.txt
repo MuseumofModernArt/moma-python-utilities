@@ -1,0 +1,7 @@
+anthropic
+openai
+psutil
+requests
+typer
+typing_extensions
+vertexai

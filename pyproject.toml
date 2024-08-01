@@ -12,5 +12,5 @@ classifiers = [
 ]
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=70.0.0"]
 build-backend = "setuptools.build_meta"

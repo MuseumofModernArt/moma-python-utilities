@@ -217,6 +217,36 @@ def publish(
     }
     requests.post(url, headers=headers, data=json.dumps(payload))
 
+@app.command()
+def create(
+    name,
+    project: Annotated[str, typer.Option("--project", "-j")]='moma-apps-staging',
+    region: Annotated[str, typer.Option("--region", "-r")]='us-east4',
+    topic: Annotated[str, typer.Option("--topic", "-t")]='',
+    retry=False,
+):
+    asyncio.run(_create(name, project, region, topic, retry))
+
+async def _create(name, project, region, topic, retry):
+    func_name = f'{topic}-{name}'
+
+    options = [
+        f'--gen2',
+        f'--project {project}',
+        f'--region {region}',
+        f'--trigger-topic={topic}',
+        f'--runtime=python312',
+        f'--entry-point=main',
+        f'--source=cloud-functions/{topic}/{name}',]
+
+    if retry:
+        options.append('--retry')
+
+    proc = await asyncio.create_subprocess_shell(
+        f'gcloud functions deploy {func_name} {' '.join(options)}'
+    )
+    await proc.communicate()
+
 _cloud_functions_config = None
 def cloud_functions_config():
     global _cloud_functions_config
@@ -245,17 +275,18 @@ def cloud_function_config(name):
 def get_pid_for_port(port):
     connections = psutil.net_connections()
     for con in connections:
+        if (
+            con.raddr != tuple() and con.raddr.port == port
+           ) or (
+            con.laddr != tuple() and con.laddr.port == port
+           ):
+            _pp.pprint(con)
+
+    for con in connections:
         if con.raddr != tuple():
-            if con.raddr.port == port and con.status == 'ESTABLISHED':
+            if con.raddr.port == port and con.status == 'LISTEN':
                 return con.pid, con.status
         if con.laddr != tuple():
-            if con.laddr.port == port and con.status == 'ESTABLISHED':
+            if con.laddr.port == port and con.status == 'LISTEN':
                 return con.pid, con.status
     return None, None
-
-    # +add command for sending test payload (output underlying curl command)
-    # add command for creating new function at a certain path
-        # launch.json configuration
-
-    # move moma-python-utilities into a separate repo
-    # move ai code into moma-python-utilities?
