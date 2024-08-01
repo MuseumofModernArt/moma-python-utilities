@@ -43,10 +43,10 @@ async def _run_local(name, port, project, subscription, topic, s_port):
     with open(env_file, 'w+') as f:
         f.write(environment)
 
-    print(f'running -- honcho -d cloud-functions/ -f HProcfile -e {env_file} start')
+    print(f'running -- honcho -d cloudfunctions/ -f HProcfile -e {env_file} start')
 
     proc = await asyncio.create_subprocess_shell(
-        f'honcho -d cloud-functions/ -f HProcfile -e {env_file} start'
+        f'honcho -d cloudfunctions/ -f HProcfile -e {env_file} start'
     )
     await proc.communicate()
 
@@ -237,7 +237,7 @@ async def _create(name, project, region, topic, retry):
         f'--trigger-topic={topic}',
         f'--runtime=python312',
         f'--entry-point=main',
-        f'--source=cloud-functions/{topic}/{name}',]
+        f'--source=cloudfunctions/{topic}/{name}',]
 
     if retry:
         options.append('--retry')
