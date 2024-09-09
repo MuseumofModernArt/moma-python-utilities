@@ -53,11 +53,14 @@ class SyncPipelineOptions(GoogleCloudOptions):
         parser.add_argument('--jdbc-url', dest='jdbc_url')
         parser.add_argument('--pipeline', dest='pipeline')
 
-def make_runner(model):
+def make_runner(model, runner_options=None):
     def run(argv=None):
         global pipeline_options
 
-        options = SyncPipelineOptions()
+        if runner_options is None:
+            options = SyncPipelineOptions()
+        else:
+            options = runner_options
         pipeline_options = options.view_as(SyncPipelineOptions)
 
         project = pipeline_options.project
