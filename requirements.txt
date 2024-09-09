@@ -1,4 +1,7 @@
 anthropic
+apache-beam[gcp]
+google-cloud-bigquery
+google-cloud-secret-manager
 openai
 psutil
 requests
