@@ -18,21 +18,21 @@ class Cart(typing.NamedTuple):
 
     name='Carts'
     job_name='import-carts'
-    bq_table_name = 'carts'
-    bq_table_schema = {
-            'fields': [
-                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-                { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED'},
-                { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'admin_user_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            ]
-        }
+    bq_table_name='carts'
+    bq_table_schema={
+        'fields': [
+            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
+            { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED'},
+            { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE'},
+            { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
+            { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
+            { 'name': 'admin_user_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+            { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+        ]
+    }
 
     pg_table_name = 'carts'
 
@@ -52,6 +52,9 @@ class Cart(typing.NamedTuple):
             FROM carts
             WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
         """
+
+    def to_dict(row):
+        return row._asdict()
 
 run = pl.make_runner(Cart)
 

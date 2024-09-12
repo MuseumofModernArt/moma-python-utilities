@@ -6,14 +6,30 @@ Python utilities and shared libraries to be used with gcp / ai projects
 To run locally (there might be some requirements to install, you need to have gcloud installed with permission for gcp resources that are accessed):
 
 ```
-  python3 -m pip install -e .
-  python -m moma.pipelines.synccarts.run \
+python -m pip install -e .
+```
+
+```
+  python -m moma.pipelines.synccarts \
     --runner direct \
     --jdbc-password-secret moma-apps-staging/secrets/sfdb-staging-password \
     --jdbc-username=u8dn62okb4cal2 \
     --jdbc-url=jdbc:postgresql://ec2-107-22-81-215.compute-1.amazonaws.com:5432/d5igktit12blu6 \
     --project moma-apps-staging \
     --temp_location gs://pgsql-bq-loading-jobs/import-carts-dataflow/
+```
+
+    - or -
+
+```
+  python -m moma.pipelines.__init__ \
+    --runner direct \
+    --jdbc-password-secret moma-apps-staging/secrets/sfdb-staging-password \
+    --jdbc-username=u8dn62okb4cal2 \
+    --jdbc-url=jdbc:postgresql://ec2-107-22-81-215.compute-1.amazonaws.com:5432/d5igktit12blu6 \
+    --project moma-apps-staging \
+    --temp_location gs://pgsql-bq-loading-jobs/import-carts-dataflow/ \
+    --pipeline=carts
 ```
 
 To run on gcp:

@@ -83,7 +83,7 @@ def make_runner(model, runner_options=None):
         (
             pipeline |
                 f'Get{model.name}Data' >> data_source(model, begin, end) |
-                beam.Map(lambda row: row._asdict()) |
+                beam.Map(model.to_dict) |
                 f'Write{model.name}ToBQ' >> data_sink(model)
         )
         result = pipeline.run()
@@ -241,6 +241,21 @@ if __name__ == '__main__':
         pipeline = args.pipeline
 
     match pipeline:
+        case "admin_users":
+            syncadminusers = importlib.import_module('moma.pipelines.syncadminusers')
+            make_runner(syncadminusers.AdminUser)()
         case "carts":
-            synccarts = importlib.import_module('moma.pipelines.synccarts.run')
+            synccarts = importlib.import_module('moma.pipelines.synccarts')
             make_runner(synccarts.Cart)()
+        case "line_items":
+            synclineitems = importlib.import_module('moma.pipelines.synclineitems')
+            make_runner(synclineitems.LineItem)()
+        case "login_methods":
+            syncloginmethods = importlib.import_module('moma.pipelines.syncloginmethods')
+            make_runner(syncloginmethods.LoginMethod)()
+        case "payment_details":
+            syncpaymentdetails = importlib.import_module('moma.pipelines.syncpaymentdetails')
+            make_runner(syncpaymentdetails.PaymentDetail)()
+        case "users":
+            syncusers = importlib.import_module('moma.pipelines.syncusers')
+            make_runner(syncusers.User)()
