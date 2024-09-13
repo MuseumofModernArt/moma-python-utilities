@@ -52,6 +52,9 @@ class SyncPipelineOptions(GoogleCloudOptions):
         parser.add_argument('--jdbc-username', dest='jdbc_username')
         parser.add_argument('--jdbc-url', dest='jdbc_url')
         parser.add_argument('--pipeline', dest='pipeline')
+        parser.add_argument('--temp-project', dest='temp_project')
+        parser.add_argument('--destination-project', dest='dest_project')
+        parser.add_argument('--destination-dataset', dest='dest_dataset', default='moma')
 
 def make_runner(model, runner_options=None):
     def run(argv=None):
@@ -64,11 +67,21 @@ def make_runner(model, runner_options=None):
         pipeline_options = options.view_as(SyncPipelineOptions)
 
         project = pipeline_options.project
+        temp_project = pipeline_options.temp_project
+        if temp_project is None:
+            temp_project = project
+
+        dest_project = pipeline_options.dest_project
+        if dest_project is None:
+            dest_project = project
+
+        dest_dataset = pipeline_options.dest_dataset
+
         job_name = model.job_name
 
-        last_pipeline_status = get_last_successful_pipeline_status(job_name, project)
+        last_pipeline_status = get_last_successful_pipeline_status(job_name, temp_project)
         status = PipelineStatus(name=job_name, status='started')
-        new_pipeline_status = upsert_pipeline_status(status, project)
+        new_pipeline_status = upsert_pipeline_status(status, temp_project)
 
         print('last pipeline status')
         _pp.pprint(last_pipeline_status)
@@ -89,12 +102,12 @@ def make_runner(model, runner_options=None):
         result = pipeline.run()
         result.wait_until_finish()
 
-        source = f'{project}.moma_import.{model.bq_table_name}'
-        destination = f'{project}.moma.{model.bq_table_name}'
+        source = f'{temp_project}.moma_import.{model.bq_table_name}'
+        destination = f'{dest_project}.{dest_dataset}.{model.bq_table_name}'
         bigquery_merge(source, destination, model._fields)
 
         new_pipeline_status.status = 'success'
-        new_pipeline_status = upsert_pipeline_status(new_pipeline_status, project)
+        new_pipeline_status = upsert_pipeline_status(new_pipeline_status, temp_project)
 
         print('new pipeline status (finished)')
         _pp.pprint(new_pipeline_status)
@@ -108,7 +121,7 @@ def data_source(model, begin, end):
 
 def data_sink(model):
     return bigquery_sink(
-        table_name=f'{pipeline_options.project}:moma_import.{model.bq_table_name}',
+        table_name=f'{pipeline_options.temp_project}:moma_import.{model.bq_table_name}',
         table_schema=model.bq_table_schema
     )
 

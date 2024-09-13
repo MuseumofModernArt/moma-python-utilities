@@ -16,6 +16,9 @@ python -m pip install -e .
     --jdbc-username=u8dn62okb4cal2 \
     --jdbc-url=jdbc:postgresql://ec2-107-22-81-215.compute-1.amazonaws.com:5432/d5igktit12blu6 \
     --project moma-apps-staging \
+    --temp-project moma-apps-staging \
+    --destination-project moma-dw \
+    --destination-dataset moma_apps_staging \
     --temp_location gs://pgsql-bq-loading-jobs/import-carts-dataflow/
 ```
 
@@ -28,6 +31,9 @@ python -m pip install -e .
     --jdbc-username=u8dn62okb4cal2 \
     --jdbc-url=jdbc:postgresql://ec2-107-22-81-215.compute-1.amazonaws.com:5432/d5igktit12blu6 \
     --project moma-apps-staging \
+    --temp-project moma-apps-staging \
+    --destination-project moma-dw \
+    --destination-dataset moma_apps_staging \
     --temp_location gs://pgsql-bq-loading-jobs/import-carts-dataflow/ \
     --pipeline=carts
 ```
@@ -42,6 +48,9 @@ To run on gcp:
     --jdbc-username=u8dn62okb4cal2 \
     --jdbc-url=jdbc:postgresql://ec2-107-22-81-215.compute-1.amazonaws.com:5432/d5igktit12blu6 \
     --project moma-apps-staging \
+    --temp-project moma-apps-staging \
+    --destination-project moma-dw \
+    --destination-dataset moma_apps_staging \
     --region us-east4 \
     --no_use_public_ips \
     --network moma-apps-staging-vpc1 \
