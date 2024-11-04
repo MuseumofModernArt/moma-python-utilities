@@ -8,3 +8,4 @@ requests
 typer
 typing_extensions
 vertexai
+pyyaml
