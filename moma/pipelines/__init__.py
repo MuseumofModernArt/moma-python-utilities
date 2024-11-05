@@ -126,7 +126,7 @@ def data_sink(model):
     )
 
 def postgres_source(table_name, query):
-    password = get_secret(f'projects/{pipeline_options.jdbc_password_secret}/versions/1')
+    password = get_secret(f'projects/{pipeline_options.jdbc_password_secret}/versions/2')
 
     return ReadFromJdbc(
         table_name=table_name,
