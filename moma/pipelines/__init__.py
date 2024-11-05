@@ -272,3 +272,9 @@ if __name__ == '__main__':
         case "users":
             syncusers = importlib.import_module('moma.pipelines.syncusers')
             make_runner(syncusers.User)()
+        case "virtual_queues":
+            syncvirtualqueues = importlib.import_module('moma.pipelines.syncvirtualqueues')
+            make_runner(syncvirtualqueues.VirtualQueue)()
+        case "virtual_queue_participants":
+            syncvirtualqueueparticipants = importlib.import_module('moma.pipelines.syncvirtualqueueparticipants')
+            make_runner(syncvirtualqueueparticipants.VirtualQueueParticipant)()
