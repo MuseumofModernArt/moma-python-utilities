@@ -54,7 +54,7 @@ class LineItem(typing.NamedTuple):
                 coalesce(properties, '{{}}'::jsonb)::text as properties,
                 coalesce(delivery_properties, '{{}}'::jsonb)::text as delivery_properties
             FROM line_items
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):

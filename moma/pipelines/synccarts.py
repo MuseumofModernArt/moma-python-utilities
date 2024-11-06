@@ -50,7 +50,7 @@ class Cart(typing.NamedTuple):
                 account_id,
                 fallback_account_id
             FROM carts
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):

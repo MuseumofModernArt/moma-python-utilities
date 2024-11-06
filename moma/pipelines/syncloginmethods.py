@@ -38,7 +38,7 @@ class LoginMethod(typing.NamedTuple):
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
             FROM login_methods
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):

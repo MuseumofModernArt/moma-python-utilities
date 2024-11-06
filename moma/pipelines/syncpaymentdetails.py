@@ -48,7 +48,7 @@ class PaymentDetail(typing.NamedTuple):
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
                 coalesce(properties, '{{}}'::jsonb)::text as properties
             FROM payment_details
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
