@@ -62,7 +62,7 @@ class User(typing.NamedTuple):
                 external_reference,
                 to_char(coalesce(last_authenticated_on, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as last_authenticated_on
             FROM users
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):

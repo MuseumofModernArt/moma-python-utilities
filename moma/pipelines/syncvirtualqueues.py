@@ -55,7 +55,7 @@ class VirtualQueue(typing.NamedTuple):
                 to_char(coalesce(closing_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as closing_date,
                 timeout_in_minutes
             FROM virtual_queues
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at > timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):

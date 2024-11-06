@@ -90,7 +90,7 @@ class VirtualQueueParticipant(typing.NamedTuple):
                 to_char(coalesce(unserved_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as unserved_at,
                 coalesce(properties, '{{}}'::jsonb)::text as properties
             FROM virtual_queue_participants
-            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}' AND timestamp '{end.isoformat()}';
+            WHERE updated_at BETWEEN timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
