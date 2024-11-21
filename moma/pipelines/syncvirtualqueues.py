@@ -26,16 +26,16 @@ class VirtualQueue(typing.NamedTuple):
     bq_table_name='virtual_queues'
     bq_table_schema={
             'fields': [
-                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-                { 'name': 'display_title_public', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'max_capacity', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'slug', 'type': 'STRING', 'mode': 'NULLABLE'},
-                { 'name': 'opening_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'closing_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'timeout_in_minutes', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'display_title_public', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'max_capacity', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'slug', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'opening_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'closing_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'timeout_in_minutes', 'type': 'INTEGER', 'mode': 'NULLABLE' },
             ]
         }
 

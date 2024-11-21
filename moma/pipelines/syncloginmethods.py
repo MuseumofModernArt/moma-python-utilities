@@ -16,15 +16,15 @@ class LoginMethod(typing.NamedTuple):
     job_name='import-login-methods'
     bq_table_name='login_methods'
     bq_table_schema={
-        'fields': [
-            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'oauth_token', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'auth0_reference', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'user_id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-        ]
-    }
+            'fields': [
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'oauth_token', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'auth0_reference', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'user_id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+            ]
+        }
 
     pg_table_name = 'login_methods'
 

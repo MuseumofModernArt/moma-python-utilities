@@ -20,18 +20,18 @@ class PaymentDetail(typing.NamedTuple):
     job_name='import-payment-details'
     bq_table_name='payment_details'
     bq_table_schema={
-        'fields': [
-            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'uuid', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'type', 'type': 'STRING', 'mode': 'REQUIRED'},
-            { 'name': 'status', 'type': 'STRING', 'mode': 'REQUIRED'},
-            { 'name': 'amount_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-            { 'name': 'cart_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'properties', 'type': 'JSON', 'mode': 'NULLABLE'},
-        ]
-    }
+            'fields': [
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'uuid', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'type', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'status', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'amount_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'cart_id', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'properties', 'type': 'JSON', 'mode': 'NULLABLE' },
+            ]
+        }
 
     pg_table_name = 'payment_details'
 

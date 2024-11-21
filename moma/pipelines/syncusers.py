@@ -24,23 +24,23 @@ class User(typing.NamedTuple):
     job_name='import-users'
     bq_table_name='users'
     bq_table_schema={
-        'fields': [
-            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'active', 'type': 'BOOL', 'mode': 'REQUIRED'},
-            { 'name': 'email', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED'},
-            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'first_name', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'last_name', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'external_reference', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'last_authenticated_on', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-        ]
-    }
+            'fields': [
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'active', 'type': 'BOOL', 'mode': 'REQUIRED' },
+                { 'name': 'email', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'first_name', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'last_name', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'external_reference', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'last_authenticated_on', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+            ]
+        }
 
     pg_table_name = 'users'
 

@@ -12,13 +12,13 @@ class AdminUser(typing.NamedTuple):
     job_name='import-admin-users'
     bq_table_name='admin_users'
     bq_table_schema={
-        'fields': [
-            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'email', 'type': 'STRING', 'mode': 'REQUIRED'},
-            { 'name': 'google_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-        ]
-    }
+            'fields': [
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'email', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'google_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+            ]
+        }
 
     pg_table_name='admin_users'
 

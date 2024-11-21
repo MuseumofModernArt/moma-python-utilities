@@ -20,19 +20,19 @@ class Cart(typing.NamedTuple):
     job_name='import-carts'
     bq_table_name='carts'
     bq_table_schema={
-        'fields': [
-            { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-            { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED'},
-            { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-            { 'name': 'admin_user_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-            { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-        ]
-    }
+            'fields': [
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'uuid', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'status', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'contact_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'fallback_contact_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'admin_user_id', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+                { 'name': 'fallback_account_id', 'type': 'STRING', 'mode': 'NULLABLE' },
+            ]
+        }
 
     pg_table_name = 'carts'
 

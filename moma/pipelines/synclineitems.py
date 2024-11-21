@@ -23,17 +23,17 @@ class LineItem(typing.NamedTuple):
     bq_table_name='line_items'
     bq_table_schema={
             'fields': [
-                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED'},
-                { 'name': 'type', 'type': 'STRING', 'mode': 'REQUIRED'},
-                { 'name': 'quantity', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'amount_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'discounted_total_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'cart_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'finalized', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                { 'name': 'properties', 'type': 'JSON', 'mode': 'NULLABLE'},
-                { 'name': 'delivery_properties', 'type': 'JSON', 'mode': 'NULLABLE'},
+                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'type', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'quantity', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'amount_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'discounted_total_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'cart_id', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'finalized', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
+                { 'name': 'properties', 'type': 'JSON', 'mode': 'NULLABLE' },
+                { 'name': 'delivery_properties', 'type': 'JSON', 'mode': 'NULLABLE' },
             ]
         }
 
