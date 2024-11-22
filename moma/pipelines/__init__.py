@@ -278,3 +278,15 @@ if __name__ == '__main__':
         case "virtual_queue_participants":
             syncvirtualqueueparticipants = importlib.import_module('moma.pipelines.syncvirtualqueueparticipants')
             make_runner(syncvirtualqueueparticipants.VirtualQueueParticipant)()
+        case "ticketing_orders":
+            syncticketingorders = importlib.import_module('moma.pipelines.syncticketingorders')
+            make_runner(syncticketingorders.TicketingOrder)()
+        case "ticketing_tickets":
+            syncticketingtickets = importlib.import_module('moma.pipelines.syncticketingtickets')
+            make_runner(syncticketingtickets.TicketingTicket)()
+        case "ticketing_order_logs":
+            syncticketingorderlogs = importlib.import_module('moma.pipelines.syncticketingorderlogs')
+            make_runner(syncticketingorderlogs.TicketingOrderLog)()
+        case "payment_service_payments":
+            syncpaymentservicepayments = importlib.import_module('moma.pipelines.syncpaymentservicepayments')
+            make_runner(syncpaymentservicepayments.PaymentServicePayment)()
