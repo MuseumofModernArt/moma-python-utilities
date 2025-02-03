@@ -290,3 +290,15 @@ if __name__ == '__main__':
         case "payment_service_payments":
             syncpaymentservicepayments = importlib.import_module('moma.pipelines.syncpaymentservicepayments')
             make_runner(syncpaymentservicepayments.PaymentServicePayment)()
+        case "special_events":
+            syncspecialevents = importlib.import_module('moma.pipelines.syncspecialevents')
+            make_runner(syncspecialevents.SpecialEvent)()
+        case "special_event_tickets":
+            syncspecialeventtickets = importlib.import_module('moma.pipelines.syncspecialeventtickets')
+            make_runner(syncspecialeventtickets.SpecialEventTicket)()
+        case "scannables":
+            syncscannables = importlib.import_module('moma.pipelines.syncscannables')
+            make_runner(syncscannables.Scannable)()
+        case "scannable_events":
+            syncscannableevents = importlib.import_module('moma.pipelines.syncscannableevents')
+            make_runner(syncscannableevents.ScannableEvent)()
