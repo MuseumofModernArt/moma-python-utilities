@@ -5,20 +5,21 @@ import typing
 import moma.pipelines as pl
 
 class User(typing.NamedTuple):
-    id: int
-    active: bool
-    email: str
-    uuid: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    first_name: str
-    last_name: str
-    contact_id: str
-    fallback_contact_id: str
-    account_id: str
-    fallback_account_id: str
-    external_reference: str
-    last_authenticated_on: datetime.datetime
+    class Record(typing.NamedTuple):
+        id: int
+        active: bool
+        email: str
+        uuid: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        first_name: str
+        last_name: str
+        contact_id: str
+        fallback_contact_id: str
+        account_id: str
+        fallback_account_id: str
+        external_reference: str
+        last_authenticated_on: datetime.datetime
 
     name='Users'
     job_name='import-users'

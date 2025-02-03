@@ -6,15 +6,16 @@ import typing
 import moma.pipelines as pl
 
 class PaymentDetail(typing.NamedTuple):
-    id: int
-    uuid: str
-    type: str
-    status: str
-    amount_in_cents: int
-    cart_id: int
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    properties: dict
+    class Record(typing.NamedTuple):
+        id: int
+        uuid: str
+        type: str
+        status: str
+        amount_in_cents: int
+        cart_id: int
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        properties: dict
 
     name='PaymentDetails'
     job_name='import-payment-details'

@@ -5,12 +5,13 @@ import typing
 import moma.pipelines as pl
 
 class LoginMethod(typing.NamedTuple):
-    id: int
-    oauth_token: str
-    auth0_reference: str
-    user_id: int
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    class Record(typing.NamedTuple):
+        id: int
+        oauth_token: str
+        auth0_reference: str
+        user_id: int
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
 
     name='LoginMethods'
     job_name='import-login-methods'

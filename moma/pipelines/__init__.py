@@ -104,7 +104,7 @@ def make_runner(model, runner_options=None):
 
         source = f'{temp_project}.moma_import.{model.bq_table_name}'
         destination = f'{dest_project}.{dest_dataset}.{model.bq_table_name}'
-        bigquery_merge(source, destination, model._fields)
+        bigquery_merge(source, destination, model.Record._fields)
 
         new_pipeline_status.status = 'success'
         new_pipeline_status = upsert_pipeline_status(new_pipeline_status, temp_project)

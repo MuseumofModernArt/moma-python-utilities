@@ -5,13 +5,14 @@ import typing
 import moma.pipelines as pl
 
 class TicketingOrderLog(typing.NamedTuple):
-    id: str
-    request_path: str
-    request_body: str
-    response_body: str
-    order_id: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    class Record(typing.NamedTuple):
+        id: str
+        request_path: str
+        request_body: str
+        response_body: str
+        order_id: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
 
     name='TicketingOrderLogs'
     job_name='import-ticketing-order-logs'

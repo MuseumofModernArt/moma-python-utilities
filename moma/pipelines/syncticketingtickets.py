@@ -5,22 +5,23 @@ import typing
 import moma.pipelines as pl
 
 class TicketingTicket(typing.NamedTuple):
-    id: str
-    ticket_type_id: str
-    description: str
-    type_of_ticket: str
-    price: int
-    ticket_number: str
-    barcode: str
-    date: str
-    status: int
-    order_id: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    external_order_item_id: str
-    external_id: str
-    event_id: str
-    template_id: str
+    class Record(typing.NamedTuple):
+        id: str
+        ticket_type_id: str
+        description: str
+        type_of_ticket: str
+        price: int
+        ticket_number: str
+        barcode: str
+        date: str
+        status: int
+        order_id: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        external_order_item_id: str
+        external_id: str
+        event_id: str
+        template_id: str
 
     name='TicketingTickets'
     job_name='import-ticketing-tickets'

@@ -3,10 +3,11 @@ import logging
 
 import moma.pipelines as pl
 
-class AdminUser(typing.NamedTuple):
-    id: int
-    email: str
-    google_id: str
+class AdminUser:
+    class Record(typing.NamedTuple):
+        id: int
+        email: str
+        google_id: str
 
     name='AdminUsers'
     job_name='import-admin-users'

@@ -6,29 +6,30 @@ import logging
 import moma.pipelines as pl
 
 class VirtualQueueParticipant(typing.NamedTuple):
-    id: int
-    first_name: str
-    last_name: str
-    email: str
-    phone_number: str
-    phone_country_code: str
-    virtual_queue_id: int
-    slots: int
-    status: str
-    priority: int
-    uuid: str
-    marketing_opt_in: bool
-    user_id: int
-    web_push_device_id: int
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    receive_sms: bool
-    notified_at: datetime.datetime
-    visiting_at: datetime.datetime
-    admitted_count: int
-    cancelled_at: datetime.datetime
-    unserved_at: datetime.datetime
-    properties: dict
+    class Record(typing.NamedTuple):
+        id: int
+        first_name: str
+        last_name: str
+        email: str
+        phone_number: str
+        phone_country_code: str
+        virtual_queue_id: int
+        slots: int
+        status: str
+        priority: int
+        uuid: str
+        marketing_opt_in: bool
+        user_id: int
+        web_push_device_id: int
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        receive_sms: bool
+        notified_at: datetime.datetime
+        visiting_at: datetime.datetime
+        admitted_count: int
+        cancelled_at: datetime.datetime
+        unserved_at: datetime.datetime
+        properties: dict
 
     name='VirtualQueueParticipants'
     job_name='import-virtual-queue-participants'

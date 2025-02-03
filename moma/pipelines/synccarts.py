@@ -4,17 +4,18 @@ import typing
 
 import moma.pipelines as pl
 
-class Cart(typing.NamedTuple):
-    id: int
-    uuid: str
-    status: str
-    contact_id: str
-    fallback_contact_id: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    admin_user_id: int
-    account_id: str
-    fallback_account_id: str
+class Cart:
+    class Record(typing.NamedTuple):
+        id: int
+        uuid: str
+        status: str
+        contact_id: str
+        fallback_contact_id: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        admin_user_id: int
+        account_id: str
+        fallback_account_id: str
 
     name='Carts'
     job_name='import-carts'

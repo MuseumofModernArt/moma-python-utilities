@@ -6,17 +6,18 @@ import typing
 import moma.pipelines as pl
 
 class LineItem(typing.NamedTuple):
-    id: int
-    type: str
-    quantity: int
-    amount_in_cents: int
-    discounted_total_in_cents: int
-    cart_id: int
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    finalized: datetime.datetime
-    properties: dict
-    delivery_properties: dict
+    class Record(typing.NamedTuple):
+        id: int
+        type: str
+        quantity: int
+        amount_in_cents: int
+        discounted_total_in_cents: int
+        cart_id: int
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        finalized: datetime.datetime
+        properties: dict
+        delivery_properties: dict
 
     name='LineItems'
     job_name='import-line-items'

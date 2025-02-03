@@ -5,21 +5,22 @@ import logging
 import moma.pipelines as pl
 
 class TicketingOrder(typing.NamedTuple):
-    id: str
-    status: int
-    customer_id: str
-    email: str
-    reservation_id: str
-    requested_items: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    payment_id: str
-    external_id: str
-    total_amount: int
-    purchase_date: datetime.datetime
-    reservation_expires_at: datetime.datetime
-    total_refund_amount: int
-    sales_channel: str
+    class Record(typing.NamedTuple):
+        id: str
+        status: int
+        customer_id: str
+        email: str
+        reservation_id: str
+        requested_items: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        payment_id: str
+        external_id: str
+        total_amount: int
+        purchase_date: datetime.datetime
+        reservation_expires_at: datetime.datetime
+        total_refund_amount: int
+        sales_channel: str
 
     name='TicketingOrders'
     job_name='import-ticketing-orders'

@@ -6,25 +6,26 @@ import typing
 import moma.pipelines as pl
 
 class PaymentServicePayment(typing.NamedTuple):
-    id: str
-    amount: int
-    external_reference: str
-    currency: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    status: str
-    terminal_id: str
-    last_digits: str
-    card_token: str
-    shopper_reference: str
-    card_brand: str
-    amount_in_cents: int
-    first_name: str
-    last_name: str
-    email: str
-    ip_address: str
-    additional_risk_data: dict
-    raw_payment_data: dict
+    class Record(typing.NamedTuple):
+        id: str
+        amount: int
+        external_reference: str
+        currency: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        status: str
+        terminal_id: str
+        last_digits: str
+        card_token: str
+        shopper_reference: str
+        card_brand: str
+        amount_in_cents: int
+        first_name: str
+        last_name: str
+        email: str
+        ip_address: str
+        additional_risk_data: dict
+        raw_payment_data: dict
 
     name='PaymentServicePayments'
     job_name='import-payment-service-payments'

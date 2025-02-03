@@ -1,8 +1,3 @@
-# model tables in bigquery (staging / production)
-# python pipeline definition
-# run the job locally
-# set up the scheduler
-
 import datetime
 import typing
 import logging
@@ -10,16 +5,17 @@ import logging
 import moma.pipelines as pl
 
 class VirtualQueue(typing.NamedTuple):
-    id: int
-    display_title_public: str
-    max_capacity: int
-    status: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    slug: str
-    opening_date: datetime.datetime
-    closing_date: datetime.datetime
-    timeout_in_minutes: int
+    class Record(typing.NamedTuple):
+        id: int
+        display_title_public: str
+        max_capacity: int
+        status: str
+        created_at: datetime.datetime
+        updated_at: datetime.datetime
+        slug: str
+        opening_date: datetime.datetime
+        closing_date: datetime.datetime
+        timeout_in_minutes: int
 
     name='VirtualQueues'
     job_name='import-virtual-queues'
