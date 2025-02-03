@@ -40,26 +40,26 @@ class SpecialEventTicket(typing.NamedTuple):
     def pg_source_query(begin, end):
         return f"""
             SELECT
-                id,
-                name,
-                dollar_amount,
-                identifier,
-                CASE WHEN status=0 THEN 'reserved'
-                     WHEN status=1 THEN 'purchased'
-                     WHEN status=2 THEN 'refunded'
-                     WHEN status=3 THEN 'refunding'
+                special_event_tickets.id AS id,
+                special_event_tickets.name AS name,
+                special_event_tickets.dollar_amount AS dollar_amount,
+                special_event_tickets.identifier AS identifier,
+                CASE WHEN special_event_tickets.status=0 THEN 'reserved'
+                     WHEN special_event_tickets.status=1 THEN 'purchased'
+                     WHEN special_event_tickets.status=2 THEN 'refunded'
+                     WHEN special_event_tickets.status=3 THEN 'refunding'
                 END as status,
-                contribution_level_id,
-                line_item_id,
-                special_event_id,
-                to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
-                to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
+                special_event_tickets.contribution_level_id AS contribution_level_id,
+                special_event_tickets.line_item_id AS line_item_id,
+                contribution_levels.special_event_id AS special_event_id,
+                to_char(special_event_tickets.created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
+                to_char(special_event_tickets.updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
             FROM special_event_tickets
-            WHERE updated_at >= timestamp '{begin.isoformat()}';
+                INNER JOIN contribution_levels ON special_event_tickets.contribution_level_id = contribution_levels.id
+            WHERE special_event_tickets.updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
-        # if there is an issue with status, try receiving it as an int and converting to string here
         return row._asdict()
 
 run = pl.make_runner(SpecialEventTicket)

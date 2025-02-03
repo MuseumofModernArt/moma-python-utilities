@@ -33,7 +33,7 @@ class Scannable(typing.NamedTuple):
         return f"""
             SELECT
                 id,
-                uuid,
+                uuid::text,
                 scannable_id,
                 scannable_type,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
