@@ -48,6 +48,9 @@ class SpecialEventTicket(typing.NamedTuple):
                      WHEN special_event_tickets.status=1 THEN 'purchased'
                      WHEN special_event_tickets.status=2 THEN 'refunded'
                      WHEN special_event_tickets.status=3 THEN 'refunding'
+                     WHEN special_event_tickets.status=4 THEN 'expired'
+                     WHEN special_event_tickets.status=5 THEN 'pledged'
+                     ELSE 'unknown [' || COALESCE(special_event_tickets.status, -1) || ']'
                 END as status,
                 special_event_tickets.contribution_level_id AS contribution_level_id,
                 special_event_tickets.line_item_id AS line_item_id,
