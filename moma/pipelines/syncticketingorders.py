@@ -20,6 +20,7 @@ class TicketingOrder(typing.NamedTuple):
         purchase_date: datetime.datetime
         reservation_expires_at: datetime.datetime
         total_refund_amount: int
+        order_number: str
         sales_channel: str
 
     name='TicketingOrders'
@@ -41,6 +42,7 @@ class TicketingOrder(typing.NamedTuple):
                 { 'name': 'purchase_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
                 { 'name': 'reservation_expires_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
                 { 'name': 'total_refund_amount', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+                { 'name': 'order_number', 'type': 'STRING', 'mode': 'NULLABLE' },
                 { 'name': 'sales_channel', 'type': 'STRING', 'mode': 'NULLABLE' },
             ]
         }
@@ -63,6 +65,7 @@ class TicketingOrder(typing.NamedTuple):
                 to_char(coalesce(purchase_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as purchase_date,
                 to_char(coalesce(reservation_expires_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as reservation_expires_at,
                 total_refund_amount,
+                order_number,
                 sales_channel
             FROM ticketing.orders
             WHERE updated_at >= timestamp '{begin.isoformat()}';

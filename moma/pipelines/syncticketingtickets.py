@@ -8,6 +8,7 @@ class TicketingTicket(typing.NamedTuple):
     class Record(typing.NamedTuple):
         id: str
         ticket_type_id: str
+        name: str
         description: str
         type_of_ticket: str
         price: int
@@ -30,6 +31,7 @@ class TicketingTicket(typing.NamedTuple):
             'fields': [
                 { 'name': 'id', 'type': 'STRING', 'mode': 'REQUIRED' },
                 { 'name': 'ticket_type_id', 'type': 'STRING', 'mode': 'REQUIRED' },
+                { 'name': 'name', 'type': 'STRING', 'mode': 'NULLABLE' },
                 { 'name': 'description', 'type': 'STRING', 'mode': 'NULLABLE' },
                 { 'name': 'type_of_ticket', 'type': 'STRING', 'mode': 'NULLABLE' },
                 { 'name': 'price', 'type': 'INTEGER', 'mode': 'REQUIRED' },
@@ -54,6 +56,7 @@ class TicketingTicket(typing.NamedTuple):
             SELECT
                 id::text,
                 ticket_type_id,
+                name,
                 description,
                 type_of_ticket,
                 price,
