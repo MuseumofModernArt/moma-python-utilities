@@ -8,7 +8,7 @@ class Scannable(typing.NamedTuple):
     class Record(typing.NamedTuple):
         id: int
         uuid: str
-        scannable_id: int
+        scannable_id: str
         scannable_type: str
         created_at: datetime.datetime
         updated_at: datetime.datetime
@@ -20,7 +20,7 @@ class Scannable(typing.NamedTuple):
         'fields': [
             { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
             { 'name': 'uuid', 'type': 'STRING', 'mode': 'NULLABLE' },
-            { 'name': 'scannable_id', 'type': 'INTEGER', 'mode': 'NULLABLE' },
+            { 'name': 'scannable_id', 'type': 'STRING', 'mode': 'NULLABLE' },
             { 'name': 'scannable_type', 'type': 'STRING', 'mode': 'NULLABLE' },
             { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
             { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
