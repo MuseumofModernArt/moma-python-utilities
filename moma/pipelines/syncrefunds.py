@@ -7,7 +7,7 @@ import moma.pipelines as pl
 
 class Refund(typing.NamedTuple):
     class Record(typing.NamedTuple):
-        id: int
+        id: str
         payment_detail_id: int
         idempotency_key: str
         amount_in_cents: int
@@ -27,7 +27,7 @@ class Refund(typing.NamedTuple):
     bq_table_name='refunds'
     bq_table_schema={
             'fields': [
-                { 'name': 'id', 'type': 'INTEGER', 'mode': 'REQUIRED' },
+                { 'name': 'id', 'type': 'STRING', 'mode': 'REQUIRED' },
                 { 'name': 'payment_detail_id', 'type': 'INTEGER', 'mode': 'NULLABLE' },
                 { 'name': 'idempotency_key', 'type': 'STRING', 'mode': 'NULLABLE' },
                 { 'name': 'amount_in_cents', 'type': 'INTEGER', 'mode': 'NULLABLE' },
@@ -49,7 +49,7 @@ class Refund(typing.NamedTuple):
     def pg_source_query(begin, end):
         return f"""
             SELECT
-                id,
+                id::text,
                 payment_detail_id,
                 idempotency_key,
                 amount_in_cents,
