@@ -40,7 +40,7 @@ class PaymentDetail(typing.NamedTuple):
         return f"""
             SELECT
                 id,
-                uuid,
+                uuid::text,
                 type,
                 status,
                 amount_in_cents,
