@@ -290,6 +290,9 @@ if __name__ == '__main__':
         case "payment_service_payments":
             syncpaymentservicepayments = importlib.import_module('moma.pipelines.syncpaymentservicepayments')
             make_runner(syncpaymentservicepayments.PaymentServicePayment)()
+        case "refunds":
+            syncrefunds = importlib.import_module('moma.pipelines.syncrefunds')
+            make_runner(syncrefunds.Refund)()
         case "special_events":
             syncspecialevents = importlib.import_module('moma.pipelines.syncspecialevents')
             make_runner(syncspecialevents.SpecialEvent)()
