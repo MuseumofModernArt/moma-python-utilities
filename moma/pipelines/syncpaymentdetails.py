@@ -40,7 +40,7 @@ class PaymentDetail(typing.NamedTuple):
         return f"""
             SELECT
                 id,
-                uuid::text,
+                coalesce(uuid::text, '00000000-0000-0000-0000-000000000000') as uuid,
                 type,
                 status,
                 amount_in_cents,
@@ -55,6 +55,8 @@ class PaymentDetail(typing.NamedTuple):
     def to_dict(row):
         d = row._asdict()
         d['properties'] = json.loads(d['properties'])
+        if d['uuid'] == '00000000-0000-0000-0000-000000000000':
+            d['uuid'] = None
         return d
 
 run = pl.make_runner(PaymentDetail)
