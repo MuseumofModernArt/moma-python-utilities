@@ -305,3 +305,6 @@ if __name__ == '__main__':
         case "scannable_events":
             syncscannableevents = importlib.import_module('moma.pipelines.syncscannableevents')
             make_runner(syncscannableevents.ScannableEvent)()
+        case "contribution_levels":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synccontributionlevels')
+            make_runner(synccontributionlevels.ContributionLevel)()
