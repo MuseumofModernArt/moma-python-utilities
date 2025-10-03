@@ -69,7 +69,7 @@ class ContributionLevel(typing.NamedTuple):
                 comp::text,
                 concierge_ticket::text
             FROM contribution_levels
-            WHERE updated_at >= timestamp '{begin.isoformat}';
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
