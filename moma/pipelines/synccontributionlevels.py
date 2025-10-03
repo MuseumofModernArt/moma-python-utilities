@@ -67,7 +67,7 @@ class ContributionLevel(typing.NamedTuple):
                 display_order,
                 order_quantity_limit,
                 comp::text,
-                concierge_ticket::text,
+                concierge_ticket::text
             FROM contribution_levels
             WHERE updated_at >= timestamp '{begin.isoformat}';
         """
