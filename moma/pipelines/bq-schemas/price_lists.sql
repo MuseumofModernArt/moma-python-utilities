@@ -9,7 +9,7 @@ CREATE TABLE `moma-dw.moma_apps.price_lists` (
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
-CREATE TABLE `moma-membership.momaImport.price_lists` (
+CREATE TABLE `moma-membership.moma_import.price_lists` (
     id INT64 NOT NULL,
     name STRING NOT NULL,
     description STRING,

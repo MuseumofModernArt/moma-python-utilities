@@ -10,7 +10,7 @@ CREATE TABLE `moma-dw.moma_apps.ticket_types_products` (
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
-CREATE TABLE `moma-membership.moma_imports.ticket_types_products` (
+CREATE TABLE `moma-membership.moma_import.ticket_types_products` (
     id INT64 NOT NULL,
     ticket_type_id INT64 NOT NULL,
     product_sfid STRING NOT NULL,
