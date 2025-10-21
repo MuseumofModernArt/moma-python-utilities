@@ -308,3 +308,33 @@ if __name__ == '__main__':
         case "contribution_levels":
             synccontributionlevels = importlib.import_module('moma.pipelines.synccontributionlevels')
             make_runner(synccontributionlevels.ContributionLevel)()
+        case "events":
+            synccontributionlevels = importlib.import_module('moma.pipelines.syncevents')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "price_lists":
+            synccontributionlevels = importlib.import_module('moma.pipelines.syncpricelists')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "ticket_types":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypes')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "ticket_types_products":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypesproducts')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "event_time_slots":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtimeslots')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "event_tickets":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtickets')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "price_lists_ticket_types":
+            synccontributionlevels = importlib.import_module('moma.pipelines.syncpriceliststickettypes')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "ticket_type_categories":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypecategories')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "events_ticket_type_categories":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synceventstickettypecategories')
+            make_runner(synccontributionlevels.ContributionLevel)()
+        case "event_time_slots_products":
+            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtimeslotsproducts')
+            make_runner(synccontributionlevels.ContributionLevel)()
