@@ -30,9 +30,45 @@ CREATE TABLE `moma-dw.moma_apps.events` (
     event_type STRING,
     allow_museum_admission BOOL DEFAULT false,
     reminder_emarsys_event_id STRING,
-    PRIMARY KEY (id) NOT ENFORCED
-);
+    PRIMARY KEY (id) NOT ENFORCED,
+    FOREIGN KEY (price_list_id) REFERENCES `moma-dw.moma_apps.price_lists`(id) NOT ENFORCED
+)
+PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
+
+CREATE TABLE `moma-membership.moma_import.events` (
+    id INT64 NOT NULL,
+    slug STRING NOT NULL,
+    name STRING,
+    cart_timeout_in_minutes INT64 DEFAULT 10 NOT NULL,
+    salesforce_campaign STRING,
+    order_quantity_limit INT64,
+    emarsys_event_id STRING,
+    turn_off_date TIMESTAMP,
+    contact_us_error_msg STRING,
+    location STRING,
+    exhibition STRING,
+    login_enabled BOOL DEFAULT false NOT NULL,
+    login_cta STRING DEFAULT 'Log in.',
+    login_prompt_copy STRING DEFAULT 'Do you have a MoMA account?',
+    login_features_copy STRING DEFAULT 'Log in to access tiers and pricing available to you.',
+    title STRING,
+    title_enabled BOOL,
+    start_date TIMESTAMP,
+    start_time TIMESTAMP,
+    hero_image_url_enabled BOOL,
+    hero_image_url STRING,
+    non_refundable_copy STRING DEFAULT 'As this is a benefit for The Museum of Modern Art, we regret that your purchase is non-refundable.',
+    require_mailing_address BOOL DEFAULT true NOT NULL,
+    require_phone_number BOOL DEFAULT true NOT NULL,
+    reminder_email_enabled BOOL DEFAULT false NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    price_list_id INT64,
+    event_type STRING,
+    allow_museum_admission BOOL DEFAULT false,
+    reminder_emarsys_event_id STRING
+)
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
@@ -68,9 +104,49 @@ CREATE TABLE `moma-dw.moma_apps_staging.events` (
     event_type STRING,
     allow_museum_admission BOOL DEFAULT false,
     reminder_emarsys_event_id STRING,
-    PRIMARY KEY (id) NOT ENFORCED
-);
-
+    PRIMARY KEY (id) NOT ENFORCED,
+    FOREIGN KEY (price_list_id) REFERENCES `moma-dw.moma_apps_staging.price_lists`(id) NOT ENFORCED
+)
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
+
+
+CREATE TABLE `moma-apps-staging.moma_import.events` (
+    id INT64 NOT NULL,
+    slug STRING NOT NULL,
+    name STRING,
+    cart_timeout_in_minutes INT64 DEFAULT 10 NOT NULL,
+    salesforce_campaign STRING,
+    order_quantity_limit INT64,
+    emarsys_event_id STRING,
+    turn_off_date TIMESTAMP,
+    contact_us_error_msg STRING,
+    location STRING,
+    exhibition STRING,
+    login_enabled BOOL DEFAULT false NOT NULL,
+    login_cta STRING DEFAULT 'Log in.',
+    login_prompt_copy STRING DEFAULT 'Do you have a MoMA account?',
+    login_features_copy STRING DEFAULT 'Log in to access tiers and pricing available to you.',
+    title STRING,
+    title_enabled BOOL,
+    start_date TIMESTAMP,
+    start_time TIMESTAMP,
+    hero_image_url_enabled BOOL,
+    hero_image_url STRING,
+    non_refundable_copy STRING DEFAULT 'As this is a benefit for The Museum of Modern Art, we regret that your purchase is non-refundable.',
+    require_mailing_address BOOL DEFAULT true NOT NULL,
+    require_phone_number BOOL DEFAULT true NOT NULL,
+    reminder_email_enabled BOOL DEFAULT false NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    price_list_id INT64,
+    event_type STRING,
+    allow_museum_admission BOOL DEFAULT false,
+    reminder_emarsys_event_id STRING
+)
+PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
+
+
+
+
 
 

@@ -5,8 +5,17 @@ CREATE TABLE `moma-dw.moma_apps.price_lists` (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED
-);
+)
+PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
+
+CREATE TABLE `moma-membership.momaImport.price_lists` (
+    id INT64 NOT NULL,
+    name STRING NOT NULL,
+    description STRING,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+)
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
@@ -17,8 +26,7 @@ CREATE TABLE `moma-dw.moma_apps_staging.price_lists` (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED
-);
-
+)
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
@@ -27,10 +35,8 @@ CREATE TABLE `moma-apps-staging.moma_import.price_lists` (
     name STRING NOT NULL,
     description STRING,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
-    PRIMARY KEY (id) NOT ENFORCED
-);
-
+    updated_at TIMESTAMP NOT NULL
+)
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
 
