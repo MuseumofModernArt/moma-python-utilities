@@ -4,7 +4,7 @@ import typing
 
 import moma.pipelines as pl
 
-class TicketTypeCategorie:
+class TicketTypeCategory:
     class Record(typing.NamedTuple):
         id: int
         name: str
@@ -39,7 +39,7 @@ class TicketTypeCategorie:
     def to_dict(row):
         return row._asdict()
 
-run = pl.make_runner(TicketTypeCategorie)
+run = pl.make_runner(TicketTypeCategory)
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)

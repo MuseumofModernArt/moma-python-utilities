@@ -12,10 +12,14 @@ TABLES = [
     'event_time_slots_products'
 ]
 
+def to_camel_case(snake_str: str) -> str:
+    return "".join(x.capitalize() for x in snake_str.lower().split("_"))
+
 def fill_case_statement(table_name: str) -> str:
+    unspaced_table_name = table_name.replace('_', '')
     return f'''case "{table_name}":
-    synccontributionlevels = importlib.import_module('moma.pipelines.sync{table_name.replace('_', '')}')
-    make_runner(synccontributionlevels.ContributionLevel)()'''
+    sync{unspaced_table_name} = importlib.import_module('moma.pipelines.sync{unspaced_table_name}')
+    make_runner(sync{unspaced_table_name}.{to_camel_case(table_name)})()'''
 
 for t in TABLES:
     print(fill_case_statement(t))

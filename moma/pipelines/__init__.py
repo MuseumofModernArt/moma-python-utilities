@@ -309,32 +309,32 @@ if __name__ == '__main__':
             synccontributionlevels = importlib.import_module('moma.pipelines.synccontributionlevels')
             make_runner(synccontributionlevels.ContributionLevel)()
         case "events":
-            synccontributionlevels = importlib.import_module('moma.pipelines.syncevents')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            syncevents = importlib.import_module('moma.pipelines.syncevents')
+            make_runner(syncevents.Event)()
         case "price_lists":
-            synccontributionlevels = importlib.import_module('moma.pipelines.syncpricelists')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            syncpricelists = importlib.import_module('moma.pipelines.syncpricelists')
+            make_runner(syncpricelists.PriceList)()
         case "ticket_types":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypes')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synctickettypes = importlib.import_module('moma.pipelines.synctickettypes')
+            make_runner(synctickettypes.TicketType)()
         case "ticket_types_products":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypesproducts')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synctickettypesproducts = importlib.import_module('moma.pipelines.synctickettypesproducts')
+            make_runner(synctickettypesproducts.TicketTypesProduct)()
         case "event_time_slots":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtimeslots')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synceventtimeslots = importlib.import_module('moma.pipelines.synceventtimeslots')
+            make_runner(synceventtimeslots.EventTimeSlot)()
         case "event_tickets":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtickets')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synceventtickets = importlib.import_module('moma.pipelines.synceventtickets')
+            make_runner(synceventtickets.EventTicket)()
         case "price_lists_ticket_types":
-            synccontributionlevels = importlib.import_module('moma.pipelines.syncpriceliststickettypes')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            syncpriceliststickettypes = importlib.import_module('moma.pipelines.syncpriceliststickettypes')
+            make_runner(syncpriceliststickettypes.PriceListsTicketType)()
         case "ticket_type_categories":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synctickettypecategories')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synctickettypecategories = importlib.import_module('moma.pipelines.synctickettypecategories')
+            make_runner(synctickettypecategories.TicketTypeCategory)()
         case "events_ticket_type_categories":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synceventstickettypecategories')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synceventstickettypecategories = importlib.import_module('moma.pipelines.synceventstickettypecategories')
+            make_runner(synceventstickettypecategories.EventsTicketTypeCategory)()
         case "event_time_slots_products":
-            synccontributionlevels = importlib.import_module('moma.pipelines.synceventtimeslotsproducts')
-            make_runner(synccontributionlevels.ContributionLevel)()
+            synceventtimeslotsproducts = importlib.import_module('moma.pipelines.synceventtimeslotsproducts')
+            make_runner(synceventtimeslotsproducts.EventTimeSlotsProduct)()
