@@ -1,9 +1,9 @@
 CREATE TABLE `moma-dw.moma_apps.event_tickets` (
     id INT64 NOT NULL,
-    name STRING varying NOT NULL,
+    name STRING NOT NULL,
     price_in_cents INT64 DEFAULT 0 NOT NULL,
-    identifier STRING varying NOT NULL,
-    status STRING varying NOT NULL,
+    identifier STRING NOT NULL,
+    status STRING NOT NULL,
     line_item_id INT64 NOT NULL,
     ticket_type_id INT64 NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -18,10 +18,10 @@ PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filte
 
 CREATE TABLE `moma-dw.moma_apps_staging.event_tickets` (
     id INT64 NOT NULL,
-    name STRING varying NOT NULL,
+    name STRING NOT NULL,
     price_in_cents INT64 DEFAULT 0 NOT NULL,
-    identifier STRING varying NOT NULL,
-    status STRING varying NOT NULL,
+    identifier STRING NOT NULL,
+    status STRING NOT NULL,
     line_item_id INT64 NOT NULL,
     ticket_type_id INT64 NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -36,10 +36,10 @@ PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filte
 
 CREATE TABLE `moma-apps-staging.moma_import.event_tickets` (
     id INT64 NOT NULL,
-    name STRING varying NOT NULL,
+    name STRING NOT NULL,
     price_in_cents INT64 DEFAULT 0 NOT NULL,
-    identifier STRING varying NOT NULL,
-    status STRING varying NOT NULL,
+    identifier STRING NOT NULL,
+    status STRING NOT NULL,
     line_item_id INT64 NOT NULL,
     ticket_type_id INT64 NOT NULL,
     created_at TIMESTAMP NOT NULL,

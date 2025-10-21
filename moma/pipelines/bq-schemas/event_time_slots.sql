@@ -6,7 +6,7 @@ CREATE TABLE `moma-dw.moma_apps.event_time_slots` (
     end_time TIMESTAMP,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    member_only boolean DEFAULT false NOT NULL,
+    member_only BOOL DEFAULT false NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE `moma-dw.moma_apps_staging.event_time_slots` (
     end_time TIMESTAMP,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    member_only boolean DEFAULT false NOT NULL,
+    member_only BOOL DEFAULT false NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE `moma-apps-staging.moma_import.event_time_slots` (
     end_time TIMESTAMP,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    member_only boolean DEFAULT false NOT NULL,
+    member_only BOOL DEFAULT false NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED
 );
 
