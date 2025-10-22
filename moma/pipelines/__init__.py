@@ -6,6 +6,8 @@ import os
 import pprint
 import sys
 
+from typing import Dict, List
+
 from dataclasses import dataclass
 
 from google.cloud import bigquery
@@ -18,6 +20,7 @@ import apache_beam as beam
 
 from apache_beam.typehints.schemas import LogicalType
 from apache_beam.typehints.schemas import MillisInstant
+
 
 LogicalType.register_logical_type(MillisInstant)
 
@@ -242,6 +245,14 @@ def upsert_pipeline_status(pipeline_status, project):
             began_at=row['began_at'],
         )
     return pipeline_status
+
+def booleanize_dict_values(row_dict: Dict[str, str], bools: List[str]) -> Dict[str, str]:
+    """For use in the to_dict functions of sync*.py scripts in /pipelines. Transforms the strings 'true' and 'false' into proper booleans"""
+    return {k: row_dict[k] == 'true' if k in bools else row_dict[k] for k in row_dict}
+
+def nullify_placeholder_dates(row_dict: Dict[str, str], dates: List[str], placeholder: str = '3000-01-01 00:00:00.000000') -> Dict[str, str]:
+    """For use in the to_dict functions of sync*.py scripts in /pipelines. Transforms null placeholder dates (set to the default as convention) into None."""
+    return {k: None if k in dates and row_dict[k] == placeholder else row_dict[k] for k in row_dict}
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)

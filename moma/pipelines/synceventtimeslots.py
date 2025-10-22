@@ -39,8 +39,8 @@ class EventTimeSlot:
                 id,
                 event_id,
                 max_quantity,
-                start_time,
-                end_time,
+                to_char(coalesce(start_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as start_time,
+                to_char(coalesce(end_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as end_time,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
                 member_only
@@ -49,7 +49,16 @@ class EventTimeSlot:
         """
 
     def to_dict(row):
-        return row._asdict()
+        d = row._asdict()
+        d = pl.booleanize_dict_values(
+            d,
+            bools=['member_only']
+        )
+        d = pl.nullify_placeholder_dates(
+            d,
+            dates=['start_time', 'end_time']
+        )
+        return d
 
 run = pl.make_runner(EventTimeSlot)
 

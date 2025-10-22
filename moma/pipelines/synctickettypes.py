@@ -94,7 +94,22 @@ class TicketType:
         """
 
     def to_dict(row):
-        return row._asdict()
+        d = row._asdict()
+        pl.booleanize_dict_values(
+            d,
+            bools=[
+                'visible',
+                'comp',
+                'adult_ticket',
+                'require_adult_ticket',
+                'member_ticket',
+                'require_member_ticket',
+                'care_partner',
+                'permit_care_partner',
+                'require_child_ticket'
+            ]
+        )
+        return d
 
 run = pl.make_runner(TicketType)
 

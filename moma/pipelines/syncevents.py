@@ -89,7 +89,7 @@ class Event:
                 salesforce_campaign,
                 order_quantity_limit,
                 emarsys_event_id,
-                turn_off_date,
+                to_char(coalesce(turn_off_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS turn_off_date,
                 contact_us_error_msg,
                 location,
                 exhibition,
@@ -99,8 +99,8 @@ class Event:
                 login_features_copy,
                 title,
                 title_enabled,
-                start_date,
-                start_time,
+                to_char(coalesce(start_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS start_date,
+                to_char(coalesce(start_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS start_time,
                 hero_image_url_enabled,
                 hero_image_url,
                 non_refundable_copy,
@@ -118,7 +118,24 @@ class Event:
         """
 
     def to_dict(row):
-        return row._asdict()
+        d = row._asdict()
+        d = pl.booleanize_dict_values(
+            d,
+            bools=[   
+                'login_enabled'
+                'title_enabled'
+                'hero_image_url_enabled'
+                'require_mailing_address'
+                'require_phone_number'
+                'reminder_email_enabled'
+                'allow_museum_admission'
+            ]
+        )
+        d = pl.nullify_placeholder_dates(
+            d,
+            dates=['start_date',' start_time']
+        )
+        return d
 
 run = pl.make_runner(Event)
 
