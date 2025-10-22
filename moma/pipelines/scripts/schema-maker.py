@@ -49,9 +49,10 @@ def build_bq_schema_row(el: str) -> Dict[str, str]:
 def make_bq_schema(create_schema: List[str]) -> List[Dict[str, str]]:
     return [build_bq_schema_row(el) for el in create_schema]
 
-key = 'events' # change out this string for the file name in bq-schemas
-schema = get_schema_file(key)
-print('Record Schema:')
-print(make_record_schema(schema))
-print('Transfer Schema:')
-print(make_bq_schema(schema))
+if __name__ == '__main__':
+    key = 'events' # change out this string for the file name in bq-schemas
+    schema = get_schema_file(key)
+    print('Record Schema:')
+    print(make_record_schema(schema))
+    print('Transfer Schema:')
+    print(make_bq_schema(schema))

@@ -21,5 +21,6 @@ def fill_case_statement(table_name: str) -> str:
     sync{unspaced_table_name} = importlib.import_module('moma.pipelines.sync{unspaced_table_name}')
     make_runner(sync{unspaced_table_name}.{to_camel_case(table_name)})()'''
 
-for t in TABLES:
-    print(fill_case_statement(t))
+if __name__ == '__main__':
+    for t in TABLES:
+        print(fill_case_statement(t))
