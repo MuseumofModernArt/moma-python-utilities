@@ -133,7 +133,7 @@ class Event:
         )
         d = pl.nullify_placeholder_dates(
             d,
-            dates=['start_date',' start_time']
+            dates=['start_date', 'start_time']
         )
         return d
 
