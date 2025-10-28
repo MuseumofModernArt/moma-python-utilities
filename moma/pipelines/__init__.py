@@ -6,6 +6,8 @@ import os
 import pprint
 import sys
 
+from typing import Dict, List
+
 from dataclasses import dataclass
 
 from google.cloud import bigquery
@@ -18,6 +20,7 @@ import apache_beam as beam
 
 from apache_beam.typehints.schemas import LogicalType
 from apache_beam.typehints.schemas import MillisInstant
+
 
 LogicalType.register_logical_type(MillisInstant)
 
@@ -243,6 +246,14 @@ def upsert_pipeline_status(pipeline_status, project):
         )
     return pipeline_status
 
+def booleanize_dict_values(row_dict: Dict[str, str], bools: List[str]) -> Dict[str, str]:
+    """For use in the to_dict functions of sync*.py scripts in /pipelines. Transforms the strings 'true' and 'false' into proper booleans"""
+    return {k: row_dict[k] == 'true' if k in bools else row_dict[k] for k in row_dict}
+
+def nullify_placeholder_dates(row_dict: Dict[str, str], dates: List[str], placeholder: str = '3000-01-01 00:00:00.000000') -> Dict[str, str]:
+    """For use in the to_dict functions of sync*.py scripts in /pipelines. Transforms null placeholder dates (set to the default as convention) into None."""
+    return {k: None if k in dates and row_dict[k] == placeholder else row_dict[k] for k in row_dict}
+
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
     pipeline = os.environ.get("PIPELINE")
@@ -308,3 +319,33 @@ if __name__ == '__main__':
         case "contribution_levels":
             synccontributionlevels = importlib.import_module('moma.pipelines.synccontributionlevels')
             make_runner(synccontributionlevels.ContributionLevel)()
+        case "events":
+            syncevents = importlib.import_module('moma.pipelines.syncevents')
+            make_runner(syncevents.Event)()
+        case "price_lists":
+            syncpricelists = importlib.import_module('moma.pipelines.syncpricelists')
+            make_runner(syncpricelists.PriceList)()
+        case "ticket_types":
+            synctickettypes = importlib.import_module('moma.pipelines.synctickettypes')
+            make_runner(synctickettypes.TicketType)()
+        case "ticket_types_products":
+            synctickettypesproducts = importlib.import_module('moma.pipelines.synctickettypesproducts')
+            make_runner(synctickettypesproducts.TicketTypesProduct)()
+        case "event_time_slots":
+            synceventtimeslots = importlib.import_module('moma.pipelines.synceventtimeslots')
+            make_runner(synceventtimeslots.EventTimeSlot)()
+        case "event_tickets":
+            synceventtickets = importlib.import_module('moma.pipelines.synceventtickets')
+            make_runner(synceventtickets.EventTicket)()
+        case "price_lists_ticket_types":
+            syncpriceliststickettypes = importlib.import_module('moma.pipelines.syncpriceliststickettypes')
+            make_runner(syncpriceliststickettypes.PriceListsTicketType)()
+        case "ticket_type_categories":
+            synctickettypecategories = importlib.import_module('moma.pipelines.synctickettypecategories')
+            make_runner(synctickettypecategories.TicketTypeCategory)()
+        case "events_ticket_type_categories":
+            synceventstickettypecategories = importlib.import_module('moma.pipelines.synceventstickettypecategories')
+            make_runner(synceventstickettypecategories.EventsTicketTypeCategory)()
+        case "event_time_slots_products":
+            synceventtimeslotsproducts = importlib.import_module('moma.pipelines.synceventtimeslotsproducts')
+            make_runner(synceventtimeslotsproducts.EventTimeSlotsProduct)()
