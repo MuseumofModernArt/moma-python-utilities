@@ -42,7 +42,7 @@ class Event:
     job_name='import-events'
     bq_table_name='events'
     bq_table_schema={
-        [
+        'fields': [
             {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
             {'name': 'slug', 'type': 'STRING', 'mode': 'REQUIRED'},
             {'name': 'name', 'type': 'STRING', 'mode': 'NULLABLE'},
@@ -119,22 +119,20 @@ class Event:
 
     def to_dict(row):
         d = row._asdict()
-        d = pl.booleanize_dict_values(
-            d,
-            bools=[   
-                'login_enabled'
-                'title_enabled'
-                'hero_image_url_enabled'
-                'require_mailing_address'
-                'require_phone_number'
-                'reminder_email_enabled'
-                'allow_museum_admission'
-            ]
-        )
-        d = pl.nullify_placeholder_dates(
-            d,
-            dates=['start_date', 'start_time']
-        )
+
+        d['login_enabled'] = d['login_enabled'] == 'true'
+        d['title_enabled'] = d['title_enabled'] == 'true'
+        d['hero_image_url_enabled'] = d['hero_image_url_enabled'] == 'true'
+        d['require_mailing_address'] = d['require_mailing_address'] == 'true'
+        d['require_phone_number'] = d['require_phone_number'] == 'true'
+        d['reminder_email_enabled'] = d['reminder_email_enabled'] == 'true'
+        d['allow_museum_admission'] = d['allow_museum_admission'] == 'true'
+
+        if d['start_date'] == '3000-01-01 00:00:00.000000':
+            d['start_date'] = None
+        if d['start_time'] == '3000-01-01 00:00:00.000000':
+            d['start_time'] = None
+        
         return d
 
 run = pl.make_runner(Event)

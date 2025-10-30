@@ -95,20 +95,16 @@ class TicketType:
 
     def to_dict(row):
         d = row._asdict()
-        pl.booleanize_dict_values(
-            d,
-            bools=[
-                'visible',
-                'comp',
-                'adult_ticket',
-                'require_adult_ticket',
-                'member_ticket',
-                'require_member_ticket',
-                'care_partner',
-                'permit_care_partner',
-                'require_child_ticket'
-            ]
-        )
+        d['visible'] = d['visible'] == 'true'
+        d['comp'] = d['comp'] == 'true'
+        d['adult_ticket'] = d['adult_ticket'] == 'true'
+        d['require_adult_ticket'] = d['require_adult_ticket'] == 'true'
+        d['member_ticket'] = d['member_ticket'] == 'true'
+        d['require_member_ticket'] = d['require_member_ticket'] == 'true'
+        d['care_partner'] = d['care_partner'] == 'true'
+        d['permit_care_partner'] = d['permit_care_partner'] == 'true'
+        d['require_child_ticket'] = d['require_child_ticket'] == 'true'
+
         return d
 
 run = pl.make_runner(TicketType)
