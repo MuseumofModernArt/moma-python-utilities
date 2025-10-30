@@ -23,7 +23,7 @@ CREATE TABLE `moma-dw.moma_apps.ticket_types` (
     general_ledger_designation STRING,
     require_child_ticket BOOL DEFAULT false NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED,
-    FOREIGN KEY (ticket_type_category_id) REFERENCES `moma-dw.moma_apps.ticket_type_category`(id) NOT ENFORCED
+    FOREIGN KEY (ticket_type_category_id) REFERENCES `moma-dw.moma_apps.ticket_type_categories`(id) NOT ENFORCED
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
@@ -81,7 +81,7 @@ CREATE TABLE `moma-dw.moma_apps_staging.ticket_types` (
     general_ledger_designation STRING,
     require_child_ticket BOOL DEFAULT false NOT NULL,
     PRIMARY KEY (id) NOT ENFORCED,
-    FOREIGN KEY (ticket_type_category_id) REFERENCES `moma-dw.moma_apps_staging.ticket_type_category`(id) NOT ENFORCED
+    FOREIGN KEY (ticket_type_category_id) REFERENCES `moma-dw.moma_apps_staging.ticket_type_categories`(id) NOT ENFORCED
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
