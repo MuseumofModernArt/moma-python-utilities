@@ -17,7 +17,7 @@ class EventTimeSlot:
 
     name='EventTimeSlots'
     job_name='import-event-time-slots'
-    bq_table_name='event-time-slots'
+    bq_table_name='event_time_slots'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -31,7 +31,7 @@ class EventTimeSlot:
             ]
         }
 
-    pg_table_name = 'event-time-slots'
+    pg_table_name = 'event_time_slots'
 
     def pg_source_query(begin, end):
         return f"""
@@ -43,7 +43,7 @@ class EventTimeSlot:
                 to_char(coalesce(end_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as end_time,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
-                member_only
+                member_only::text
             FROM event_time_slots
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """

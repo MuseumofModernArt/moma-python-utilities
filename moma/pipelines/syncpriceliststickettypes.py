@@ -15,7 +15,7 @@ class PriceListsTicketType:
 
     name='PriceListsTicketTypes'
     job_name='import-price-lists-ticket-types'
-    bq_table_name='price-lists-ticket-types'
+    bq_table_name='price_lists_ticket_types'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -27,7 +27,7 @@ class PriceListsTicketType:
             ]
         }
 
-    pg_table_name = 'price-lists-ticket-types'
+    pg_table_name = 'price_lists_ticket_types'
 
     def pg_source_query(begin, end):
         return f"""
