@@ -43,7 +43,7 @@ class EventTimeSlot:
                 to_char(coalesce(end_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as end_time,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
-                member_only
+                member_only::text
             FROM event_time_slots
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """

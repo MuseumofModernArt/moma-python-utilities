@@ -71,16 +71,16 @@ class TicketType:
                 caption,
                 price_in_cents,
                 ticket_identifier,
-                visible,
-                comp,
+                visible::text,
+                comp::text,
                 prior_days_can_sell_tickets,
                 event_user_max_quantity,
-                adult_ticket,
-                require_adult_ticket,
-                member_ticket,
-                require_member_ticket,
-                care_partner,
-                permit_care_partner,
+                adult_ticket::text,
+                require_adult_ticket::text,
+                member_ticket::text,
+                require_member_ticket::text,
+                care_partner::text,
+                permit_care_partner::text,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
                 internal_name,
@@ -88,7 +88,7 @@ class TicketType:
                 tax_deductible_amount_in_cents,
                 general_ledger_account,
                 general_ledger_designation,
-                require_child_ticket
+                require_child_ticket::text
             FROM ticket_types
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
