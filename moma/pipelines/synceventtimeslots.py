@@ -50,14 +50,14 @@ class EventTimeSlot:
 
     def to_dict(row):
         d = row._asdict()
-        d = pl.booleanize_dict_values(
-            d,
-            bools=['member_only']
-        )
-        d = pl.nullify_placeholder_dates(
-            d,
-            dates=['start_time', 'end_time']
-        )
+        d['member_only'] = d['member_only'] == 'true'
+
+        if d['start_time'] == '3000-01-01 00:00:00.000000':
+            d['start_time'] = None
+
+        if d['end_time'] == '3000-01-01 00:00:00.000000':
+            d['end_time'] = None
+            
         return d
 
 run = pl.make_runner(EventTimeSlot)

@@ -4,7 +4,7 @@ import typing
 
 import moma.pipelines as pl
 
-class PriceListTicketType:
+class PriceListsTicketType:
     class Record(typing.NamedTuple):
         id: int
         display_order: int
@@ -13,9 +13,9 @@ class PriceListTicketType:
         created_at: datetime.datetime
         updated_at: datetime.datetime
 
-    name='PriceListTicketTypes'
-    job_name='import-price-list-ticket-types'
-    bq_table_name='price-list-ticket-types'
+    name='PriceListsTicketTypes'
+    job_name='import-price-lists-ticket-types'
+    bq_table_name='price-lists-ticket-types'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -27,7 +27,7 @@ class PriceListTicketType:
             ]
         }
 
-    pg_table_name = 'price-list-ticket-types'
+    pg_table_name = 'price-lists-ticket-types'
 
     def pg_source_query(begin, end):
         return f"""
@@ -38,14 +38,14 @@ class PriceListTicketType:
                 ticket_type_id,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
-            FROM price_list_ticket_types
-            WHERE updated_at >= timestamp '{begin.isoformat()}';
+            FROM price_lists_ticket_types
+            WHERE updated_at >= timestamp '{begin.isoformat()}';ß
         """
 
     def to_dict(row):
         return row._asdict()
 
-run = pl.make_runner(PriceListTicketType)
+run = pl.make_runner(PriceListsTicketType)
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)

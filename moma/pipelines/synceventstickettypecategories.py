@@ -4,18 +4,18 @@ import typing
 
 import moma.pipelines as pl
 
-class EventTicketTypeCategory:
+class EventsTicketTypeCategory:
     class Record(typing.NamedTuple):
         id: int
-        event_id: int
+        events_id: int
         ticket_type_category_id: int
         max_quantity: int
         created_at: datetime.datetime
         updated_at: datetime.datetime
 
-    name='EventTicketTypeCategories'
-    job_name='import-event-ticket-type-categories'
-    bq_table_name='event-ticket-type-categories'
+    name='EventsTicketTypeCategories'
+    job_name='import-events-ticket-type-categories'
+    bq_table_name='events-ticket-type-categories'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -27,25 +27,25 @@ class EventTicketTypeCategory:
             ]
         }
 
-    pg_table_name = 'event-ticket-type-categories'
+    pg_table_name = 'events-ticket-type-categories'
 
     def pg_source_query(begin, end):
         return f"""
             SELECT
                 id,
-                event_id,
+                events_id,
                 ticket_type_category_id,
                 max_quantity,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
-            FROM event_ticket_type_categories
+            FROM events_ticket_type_categories
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
         return row._asdict()
 
-run = pl.make_runner(EventTicketTypeCategory)
+run = pl.make_runner(EventsTicketTypeCategory)
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
