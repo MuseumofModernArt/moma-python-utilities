@@ -21,7 +21,7 @@ class EventTicket:
 
     name='EventTickets'
     job_name='import-event-tickets'
-    bq_table_name='event-tickets'
+    bq_table_name='event_tickets'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -39,7 +39,7 @@ class EventTicket:
             ]
         }
 
-    pg_table_name = 'event-tickets'
+    pg_table_name = 'event_tickets'
 
     def pg_source_query(begin, end):
         return f"""

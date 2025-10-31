@@ -32,7 +32,7 @@ class TicketType:
 
     name='TicketTypes'
     job_name='import-ticket-types'
-    bq_table_name='ticket-types'
+    bq_table_name='ticket_types'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -61,7 +61,7 @@ class TicketType:
             ]
         }
 
-    pg_table_name = 'ticket-types'
+    pg_table_name = 'ticket_types'
 
     def pg_source_query(begin, end):
         return f"""

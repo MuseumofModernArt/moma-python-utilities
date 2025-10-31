@@ -17,7 +17,7 @@ class EventTimeSlot:
 
     name='EventTimeSlots'
     job_name='import-event-time-slots'
-    bq_table_name='event-time-slots'
+    bq_table_name='event_time_slots'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -31,7 +31,7 @@ class EventTimeSlot:
             ]
         }
 
-    pg_table_name = 'event-time-slots'
+    pg_table_name = 'event_time_slots'
 
     def pg_source_query(begin, end):
         return f"""

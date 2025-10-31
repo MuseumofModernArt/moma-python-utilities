@@ -14,7 +14,7 @@ class EventTimeSlotsProduct:
 
     name='EventTimeSlotsProducts'
     job_name='import-event-time-slots-productss'
-    bq_table_name='event-time-slots-productss'
+    bq_table_name='event_time_slots_productss'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -25,7 +25,7 @@ class EventTimeSlotsProduct:
             ]
         }
 
-    pg_table_name = 'event-time-slots-productss'
+    pg_table_name = 'event_time_slots_productss'
 
     def pg_source_query(begin, end):
         return f"""
