@@ -7,7 +7,7 @@ import moma.pipelines as pl
 class EventsTicketTypeCategory:
     class Record(typing.NamedTuple):
         id: int
-        events_id: int
+        event_id: int
         ticket_type_category_id: int
         max_quantity: int
         created_at: datetime.datetime
@@ -33,7 +33,7 @@ class EventsTicketTypeCategory:
         return f"""
             SELECT
                 id,
-                events_id,
+                event_id,
                 ticket_type_category_id,
                 max_quantity,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
