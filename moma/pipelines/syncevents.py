@@ -100,7 +100,7 @@ class Event:
                 title,
                 title_enabled::text,
                 to_char(coalesce(start_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS start_date,
-                to_char(coalesce(start_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS start_time,
+                to_char(coalesce(start_date + start_time, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as start_time,
                 hero_image_url_enabled::text,
                 hero_image_url,
                 non_refundable_copy,

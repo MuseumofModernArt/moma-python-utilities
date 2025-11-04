@@ -13,8 +13,8 @@ class EventTimeSlotsProduct:
         updated_at: datetime.datetime
 
     name='EventTimeSlotsProducts'
-    job_name='import-event-time-slots-productss'
-    bq_table_name='event_time_slots_productss'
+    job_name='import-event-time-slots-products'
+    bq_table_name='event_time_slots_products'
     bq_table_schema={
             'fields': [
                 {'name': 'id', 'type': 'INT64', 'mode': 'REQUIRED'},
@@ -25,7 +25,7 @@ class EventTimeSlotsProduct:
             ]
         }
 
-    pg_table_name = 'event_time_slots_productss'
+    pg_table_name = 'event_time_slots_products'
 
     def pg_source_query(begin, end):
         return f"""
@@ -35,7 +35,7 @@ class EventTimeSlotsProduct:
                 product_sfid,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
-            FROM event_time_slots_productss
+            FROM event_time_slots_products
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
