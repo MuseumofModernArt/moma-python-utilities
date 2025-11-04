@@ -39,7 +39,7 @@ class PriceListsTicketType:
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
             FROM price_lists_ticket_types
-            WHERE updated_at >= timestamp '{begin.isoformat()}';ß
+            WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
