@@ -1,18 +1,6 @@
 import re
+import sys
 from typing import List, Dict
-
-TABLES = [
-    'events',
-    'price_lists',
-    'ticket_types',
-    'ticket_types_products',
-    'event_time_slots',
-    'event_tickets',
-    'price_lists_ticket_types',
-    'ticket_type_categories',
-    'events_ticket_type_categories',
-    'event_time_slots_products'
-]
 
 TYPE_CONVERSION = {
     'STRING': 'str',
@@ -49,10 +37,14 @@ def build_bq_schema_row(el: str) -> Dict[str, str]:
 def make_bq_schema(create_schema: List[str]) -> List[Dict[str, str]]:
     return [build_bq_schema_row(el) for el in create_schema]
 
-if __name__ == '__main__':
-    key = 'events' # change out this string for the file name in bq-schemas
+def generate_schemas(key: str) -> None:
     schema = get_schema_file(key)
     print('Record Schema:')
     print(make_record_schema(schema))
     print('Transfer Schema:')
     print(make_bq_schema(schema))
+
+if __name__ == '__main__':
+    # change out this string for the file name in bq-schemas
+    table_arg = sys.argv[1]
+    generate_schemas(table_arg)
