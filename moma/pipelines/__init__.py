@@ -341,3 +341,6 @@ if __name__ == '__main__':
         case "event_time_slots_products":
             synceventtimeslotsproducts = importlib.import_module('moma.pipelines.synceventtimeslotsproducts')
             make_runner(synceventtimeslotsproducts.EventTimeSlotsProduct)()
+        case "purchased_tickets":
+            syncpurchasedtickets = importlib.import_module('moma.pipelines.syncpurchasedtickets')
+            make_runner(syncpurchasedtickets.PurchasedTicket)()
