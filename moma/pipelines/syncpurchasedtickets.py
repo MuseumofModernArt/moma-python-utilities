@@ -57,7 +57,7 @@ class PurchasedTicket(typing.NamedTuple):
     def pg_source_query(begin, end):
         return f"""
             SELECT
-                id::text AS id,
+                id::text,
                 event_id,
                 ticket_number,
                 barcode,
