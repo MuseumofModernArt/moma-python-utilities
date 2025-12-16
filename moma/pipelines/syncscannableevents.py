@@ -13,6 +13,7 @@ class ScannableEvent(typing.NamedTuple):
         created_at: datetime.datetime
         updated_at: datetime.datetime
         scan_mode: str
+        party_size: int
 
     name='ScannableEvents'
     job_name='import-scannable-events'
@@ -26,6 +27,7 @@ class ScannableEvent(typing.NamedTuple):
             { 'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
             { 'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE' },
             { 'name': 'scan_mode', 'type': 'STRING', 'mode': 'NULLABLE' },
+            { 'name': 'party_size', 'type': 'INTEGER', 'mode': 'NULLABLE' },
         ]
     }
 
@@ -40,7 +42,8 @@ class ScannableEvent(typing.NamedTuple):
                 scannable_id,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
-                scan_mode
+                scan_mode,
+                party_size
             FROM scannable_events
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
