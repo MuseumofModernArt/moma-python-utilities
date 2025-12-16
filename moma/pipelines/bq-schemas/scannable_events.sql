@@ -10,6 +10,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps.scannable_events`
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
   scan_mode STRING,
+  party_size INT64,
   PRIMARY KEY (id) NOT ENFORCED,
   FOREIGN KEY (admin_user_id) REFERENCES `moma-dw.moma_apps.admin_users`(id) NOT ENFORCED,
   FOREIGN KEY (scannable_id) REFERENCES `moma-dw.moma_apps.scannables`(id) NOT ENFORCED
@@ -27,7 +28,8 @@ CREATE OR REPLACE TABLE `moma-membership.moma_import.scannable_events`
   scannable_id INT64,
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
-  scan_mode STRING
+  scan_mode STRING,
+  party_size INT64
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
@@ -43,6 +45,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps_staging.scannable_events`
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
   scan_mode STRING,
+  party_size INT64,
   PRIMARY KEY (id) NOT ENFORCED,
   FOREIGN KEY (admin_user_id) REFERENCES `moma-dw.moma_apps_staging.admin_users`(id) NOT ENFORCED,
   FOREIGN KEY (scannable_id) REFERENCES `moma-dw.moma_apps_staging.scannables`(id) NOT ENFORCED
@@ -60,6 +63,7 @@ CREATE OR REPLACE TABLE `moma-apps-staging.moma_import.scannable_events`
   scannable_id INT64,
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
-  scan_mode STRING
+  scan_mode STRING,
+  party_size INT64
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
