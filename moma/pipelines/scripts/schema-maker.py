@@ -24,7 +24,6 @@ def get_schema_file(table_name: str) -> str:
             return ''
         
 def build_record_schema_row(el: str) -> str:
-    print(el)
     a = re.search(record_re, el)
     return (f'{a[1]}: {TYPE_CONVERSION[a[2]]}')
 
@@ -44,7 +43,8 @@ def make_bq_schema(create_schema: List[str]) -> List[Dict[str, str]]:
 def generate_schemas(key: str) -> None:
     schema = get_schema_file(key)
     print('Record Schema:')
-    print(make_record_schema(schema))
+    for el in make_record_schema(schema):
+        print(el)
     print('Transfer Schema:')
     print(make_bq_schema(schema))
 
