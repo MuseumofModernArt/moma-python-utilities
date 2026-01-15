@@ -344,3 +344,15 @@ if __name__ == '__main__':
         case "purchased_tickets":
             syncpurchasedtickets = importlib.import_module('moma.pipelines.syncpurchasedtickets')
             make_runner(syncpurchasedtickets.PurchasedTicket)()
+        case "gifts":
+            syncgifts = importlib.import_module('moma.pipelines.syncgifts')
+            make_runner(syncgifts.Gift)()
+        case "giftables":
+            syncgiftables = importlib.import_module('moma.pipelines.syncgiftables')
+            make_runner(syncgiftables.Giftable)()
+        case "gift_membership_batches":
+            syncgiftmembershipbatches = importlib.import_module('moma.pipelines.syncgiftmembershipbatches')
+            make_runner(syncgiftmembershipbatches.GiftMembershipBatch)()
+        case "gift_membership_batch_sales":
+            syncgiftmembershipbatchsales = importlib.import_module('moma.pipelines.syncgiftmembershipbatchsales')
+            make_runner(syncgiftmembershipbatchsales.GiftMembershipBatchSale)()
