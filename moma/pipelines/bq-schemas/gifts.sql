@@ -43,7 +43,8 @@ CREATE TABLE `moma-membership.moma_import.gifts` (
     notification_email_third_sent_on TIMESTAMP,
     optional_address BOOL,
     membership_start_date TIMESTAMP,
-    account_id STRING
+    account_id STRING,
+    PRIMARY KEY (id) NOT ENFORCED
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 

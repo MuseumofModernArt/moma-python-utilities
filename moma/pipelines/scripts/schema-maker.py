@@ -11,7 +11,7 @@ TYPE_CONVERSION = {
 }
 
 schema_re = re.compile(r'TABLE `moma-membership.moma_import.[a-z_]+`[ \n]\(\n(.+?)\n\)\nPART', flags=re.DOTALL)
-record_re = re.compile(r'([a-z_]+) ([A-Z0-9]+)')
+record_re = re.compile(r'([a-z_0-9]+) ([A-Z0-9]+)')
 
 def get_schema_file(table_name: str) -> str:
     with open(f'./moma/pipelines/bq-schemas/{table_name}.sql') as f:
@@ -24,18 +24,22 @@ def get_schema_file(table_name: str) -> str:
             return ''
         
 def build_record_schema_row(el: str) -> str:
+    print(el)
     a = re.search(record_re, el)
     return (f'{a[1]}: {TYPE_CONVERSION[a[2]]}')
+
+def line_is_key(line: str) -> bool:
+    return (line.startswith('PRIMARY') or line.startswith('FOREIGN'))
     
 def make_record_schema(create_schema: List[str]) -> str:
-    return [build_record_schema_row(el) for el in create_schema]
+    return [build_record_schema_row(el) for el in create_schema if not line_is_key(el)]
 
 def build_bq_schema_row(el: str) -> Dict[str, str]:
     a = re.search(record_re, el)
     return {'name': a[1], 'type': a[2], 'mode': 'REQUIRED' if 'NOT NULL' in el else 'NULLABLE'}
 
 def make_bq_schema(create_schema: List[str]) -> List[Dict[str, str]]:
-    return [build_bq_schema_row(el) for el in create_schema]
+    return [build_bq_schema_row(el) for el in create_schema if not line_is_key(el)]
 
 def generate_schemas(key: str) -> None:
     schema = get_schema_file(key)
