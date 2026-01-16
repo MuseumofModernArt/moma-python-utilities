@@ -63,18 +63,18 @@ class Giftable:
                 id,
                 status,
                 gift_code,
-                tochar(coalesce(expires_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') expires_at,
-                tochar(coalesce(purchased_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') purchased_at,
-                tochar(coalesce(activated_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') activated_at,
-                tochar(coalesce(expired_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') expired_at,
-                tochar(coalesce(redeemed_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') redeemed_at,
-                refunded_at,
+                tochar(coalesce(expires_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS expires_at,
+                tochar(coalesce(purchased_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS purchased_at,
+                tochar(coalesce(activated_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS activated_at,
+                tochar(coalesce(expired_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS expired_at,
+                tochar(coalesce(redeemed_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS redeemed_at,
+                tochar(coalesce(refunded_at, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS refunded_at
                 balance_in_cents,
                 purchased_by_id,
                 redeemed_by_id,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,,
-                tochar(coalesce(delivery_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') delivery_date,
+                tochar(coalesce(delivery_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') AS delivery_date,
                 gifter_name,
                 giftee_name,
                 gifter_email,
@@ -87,18 +87,26 @@ class Giftable:
     def to_dict(row):
         d = row._asdict()
         
-        if d['expires_at'] == '3000-01-01 00:00:00.000000':
+        if d['expires_at'] == '3000-01-01 00:00:00.000000':           
             d['expires_at'] = None
+
         if d['purchased_at'] == '3000-01-01 00:00:00.000000':
             d['purchased_at'] = None
+
         if d['activated_at'] == '3000-01-01 00:00:00.000000':
             d['activated_at'] = None
+
         if d['expired_at'] == '3000-01-01 00:00:00.000000':
             d['expired_at'] = None
+
         if d['redeemed_at'] == '3000-01-01 00:00:00.000000':
             d['redeemed_at'] = None
+            
         if d['delivery_date'] == '3000-01-01 00:00:00.000000':
             d['delivery_date'] = None
+
+        if d['refunded_at'] == '3000-01-01 00:00:00.000000':
+            d['refunded_at'] = None
 
         return d
 
