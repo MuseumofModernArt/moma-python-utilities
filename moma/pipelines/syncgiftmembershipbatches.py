@@ -48,7 +48,7 @@ class GiftMembershipBatch:
                 admin_user_id,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
-                available_in_mla,
+                available_in_mla::text,
                 bulk_salesforce_id
             FROM gift_membership_batches
             WHERE updated_at >= timestamp '{begin.isoformat()}';
@@ -59,6 +59,8 @@ class GiftMembershipBatch:
         
         if d['expires_at'] == '3000-01-01 00:00:00.000000':
             d['expires_at'] = None
+
+        d['available_in_mla'] = d['available_in_mla'] == 'true'
 
         return d
 
