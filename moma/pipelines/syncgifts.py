@@ -77,7 +77,7 @@ class Gift:
                 token,
                 to_char(coalesce(notification_email_second_sent_on, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as notification_email_second_sent_on,
                 to_char(coalesce(notification_email_third_sent_on, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as notification_email_third_sent_on,
-                optional_address,
+                optional_address::text,
                 to_char(coalesce(membership_start_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as membership_start_date,
                 account_id
             FROM gifts
