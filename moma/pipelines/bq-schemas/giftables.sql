@@ -1,4 +1,4 @@
-CREATE TABLE `moma-dw.moma_apps.giftable` (
+CREATE TABLE `moma-dw.moma_apps.giftables` (
     id INT64 NOT NULL,
     status STRING,
     gift_code STRING NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `moma-dw.moma_apps.giftable` (
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
-CREATE TABLE `moma-membership.moma_import.giftable` (
+CREATE TABLE `moma-membership.moma_import.giftables` (
     id INT64 NOT NULL,
     status STRING,
     gift_code STRING NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `moma-membership.moma_import.giftable` (
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
-CREATE TABLE `moma-dw.moma_apps_staging.giftable` (
+CREATE TABLE `moma-dw.moma_apps_staging.giftables` (
     id INT64 NOT NULL,
     status STRING,
     gift_code STRING NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE `moma-dw.moma_apps_staging.giftable` (
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = TRUE);
 
-CREATE TABLE `moma-apps-staging.moma_import.giftable` (
+CREATE TABLE `moma-apps-staging.moma_import.giftables` (
     id INT64 NOT NULL,
     status STRING,
     gift_code STRING NOT NULL,
