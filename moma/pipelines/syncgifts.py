@@ -23,7 +23,6 @@ class Gift:
         token: str
         notification_email_second_sent_on: datetime.datetime
         notification_email_third_sent_on: datetime.datetime
-        optional_address: bool
         membership_start_date: datetime.datetime
         account_id: str
 
@@ -49,7 +48,6 @@ class Gift:
                 {'name': 'token', 'type': 'STRING', 'mode': 'REQUIRED'},
                 {'name': 'notification_email_second_sent_on', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
                 {'name': 'notification_email_third_sent_on', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
-                {'name': 'optional_address', 'type': 'BOOL', 'mode': 'NULLABLE'},
                 {'name': 'membership_start_date', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'},
                 {'name': 'account_id', 'type': 'STRING', 'mode': 'NULLABLE'}
             ]
@@ -77,7 +75,6 @@ class Gift:
                 token,
                 to_char(coalesce(notification_email_second_sent_on, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as notification_email_second_sent_on,
                 to_char(coalesce(notification_email_third_sent_on, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as notification_email_third_sent_on,
-                coalesce(optional_address::text, 'false') AS optional_address,
                 to_char(coalesce(membership_start_date, '3000-01-01'::timestamp), 'YYYY-MM-DD HH24:MI:SS"."US') as membership_start_date,
                 account_id
             FROM gifts
@@ -86,7 +83,6 @@ class Gift:
 
     def to_dict(row):
         d = row._asdict()
-        d['optional_address'] = d['optional_address'] == 'true'
         
         if d['gift_start_date'] == '3000-01-01 00:00:00.000000':
             d['gift_start_date'] = None

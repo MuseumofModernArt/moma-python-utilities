@@ -16,7 +16,6 @@ CREATE TABLE `moma-dw.moma_apps.gifts` (
     token STRING NOT NULL,
     notification_email_second_sent_on TIMESTAMP,
     notification_email_third_sent_on TIMESTAMP,
-    optional_address BOOL,
     membership_start_date TIMESTAMP,
     account_id STRING,
     PRIMARY KEY (id) NOT ENFORCED
@@ -41,7 +40,6 @@ CREATE TABLE `moma-membership.moma_import.gifts` (
     token STRING NOT NULL,
     notification_email_second_sent_on TIMESTAMP,
     notification_email_third_sent_on TIMESTAMP,
-    optional_address BOOL,
     membership_start_date TIMESTAMP,
     account_id STRING,
     PRIMARY KEY (id) NOT ENFORCED
@@ -66,7 +64,6 @@ CREATE TABLE `moma-dw.moma_apps_staging.gifts` (
     token STRING NOT NULL,
     notification_email_second_sent_on TIMESTAMP,
     notification_email_third_sent_on TIMESTAMP,
-    optional_address BOOL,
     membership_start_date TIMESTAMP,
     account_id STRING,
     PRIMARY KEY (id) NOT ENFORCED
@@ -91,7 +88,6 @@ CREATE TABLE `moma-apps-staging.moma_import.gifts` (
     token STRING NOT NULL,
     notification_email_second_sent_on TIMESTAMP,
     notification_email_third_sent_on TIMESTAMP,
-    optional_address BOOL,
     membership_start_date TIMESTAMP,
     account_id STRING
 )
