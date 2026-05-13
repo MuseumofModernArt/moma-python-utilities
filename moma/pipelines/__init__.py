@@ -356,3 +356,6 @@ if __name__ == '__main__':
         case "gift_membership_batch_sales":
             syncgiftmembershipbatchsales = importlib.import_module('moma.pipelines.syncgiftmembershipbatchsales')
             make_runner(syncgiftmembershipbatchsales.GiftMembershipBatchSale)()
+        case "answers":
+            syncanswers = importlib.import_module('moma.pipelines.syncanswers')
+            make_runner(syncanswers.Answer)()
