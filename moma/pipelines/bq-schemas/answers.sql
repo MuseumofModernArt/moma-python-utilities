@@ -6,6 +6,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
+    `values` STRING NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id) NOT ENFORCED
@@ -20,9 +21,9 @@ CREATE OR REPLACE TABLE `moma-membership.moma_import.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
+    `values` STRING NOT NULL,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    PRIMARY KEY (id) NOT ENFORCED
+    updated_at TIMESTAMP
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = FALSE);
 
@@ -34,6 +35,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps_staging.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
+    `values` STRING NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id) NOT ENFORCED
@@ -48,8 +50,8 @@ CREATE OR REPLACE TABLE `moma-apps-staging.moma_import.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
+    `values` STRING NOT NULL,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    PRIMARY KEY (id) NOT ENFORCED
+    updated_at TIMESTAMP
 )
 PARTITION BY TIMESTAMP_TRUNC(created_at, MONTH) OPTIONS (require_partition_filter = FALSE);
