@@ -6,7 +6,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
-    `values` STRING NOT NULL,
+    `values` ARRAY<STRING>,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id) NOT ENFORCED
@@ -21,7 +21,7 @@ CREATE OR REPLACE TABLE `moma-membership.moma_import.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
-    `values` STRING NOT NULL,
+    `values` ARRAY<STRING>,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 )
@@ -35,7 +35,7 @@ CREATE OR REPLACE TABLE `moma-dw.moma_apps_staging.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
-    `values` STRING NOT NULL,
+    `values` ARRAY<STRING>,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     PRIMARY KEY (id) NOT ENFORCED
@@ -50,7 +50,7 @@ CREATE OR REPLACE TABLE `moma-apps-staging.moma_import.answers` (
     event_id INT64,
     type STRING NOT NULL,
     question_text STRING NOT NULL,
-    `values` STRING NOT NULL,
+    `values` ARRAY<STRING>,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 )
