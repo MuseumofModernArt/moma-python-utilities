@@ -13,6 +13,7 @@ class Answer:
         event_id: int
         type: str
         question_text: str
+        values: str
         created_at: datetime.datetime
         updated_at: datetime.datetime
 
@@ -28,6 +29,7 @@ class Answer:
                 {'name': 'event_id', 'type': 'INT64', 'mode': 'NULLABLE'}, 
                 {'name': 'type', 'type': 'STRING', 'mode': 'REQUIRED'}, 
                 {'name': 'question_text', 'type': 'STRING', 'mode': 'REQUIRED'}, 
+                {'name': 'values', 'type': 'STRING', 'mode': 'REQUIRED'}, 
                 {'name': 'created_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'}, 
                 {'name': 'updated_at', 'type': 'TIMESTAMP', 'mode': 'NULLABLE'}
             ]
@@ -45,6 +47,7 @@ class Answer:
                 event_id,
                 type,
                 question_text,
+                values,
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at
             FROM answers
