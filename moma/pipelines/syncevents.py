@@ -93,7 +93,7 @@ class Event:
                 contact_us_error_msg,
                 location,
                 exhibition,
-                login_enabled::text,
+                NULL AS login_enabled,
                 login_cta,
                 login_prompt_copy,
                 login_features_copy,
@@ -120,7 +120,6 @@ class Event:
     def to_dict(row):
         d = row._asdict()
 
-        d['login_enabled'] = d['login_enabled'] == 'true'
         d['title_enabled'] = d['title_enabled'] == 'true'
         d['hero_image_url_enabled'] = d['hero_image_url_enabled'] == 'true'
         d['require_mailing_address'] = d['require_mailing_address'] == 'true'
