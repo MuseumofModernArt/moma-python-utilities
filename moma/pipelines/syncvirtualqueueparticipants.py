@@ -76,7 +76,7 @@ class VirtualQueueParticipant(typing.NamedTuple):
                 virtual_queue_id,
                 slots,
                 status,
-                IFNULL(priority, 0) AS priority,
+                COALESCE(priority, 0) AS priority,
                 uuid::text,
                 marketing_opt_in::text,
                 user_id,
