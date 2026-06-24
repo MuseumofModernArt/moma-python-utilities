@@ -54,7 +54,7 @@ class Event:
             {'name': 'contact_us_error_msg', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'location', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'exhibition', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'login_enabled', 'type': 'BOOL', 'mode': 'REQUIRED'},
+            {'name': 'login_enabled', 'type': 'BOOL', 'mode': 'NULLABLE'},
             {'name': 'login_cta', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'login_prompt_copy', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'login_features_copy', 'type': 'STRING', 'mode': 'NULLABLE'},
