@@ -17,10 +17,6 @@ class Event:
         contact_us_error_msg: str
         location: str
         exhibition: str
-        login_enabled: bool
-        login_cta: str
-        login_prompt_copy: str
-        login_features_copy: str
         title: str
         title_enabled: bool
         start_date: datetime.datetime
