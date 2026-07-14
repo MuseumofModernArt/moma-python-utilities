@@ -57,7 +57,7 @@ class User(typing.NamedTuple):
                 first_name,
                 last_name,
                 contact_id,
-                fallback_contact_id
+                fallback_contact_id,
                 account_id,
                 fallback_account_id,
                 external_reference,
