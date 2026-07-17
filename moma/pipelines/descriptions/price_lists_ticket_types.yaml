@@ -1,0 +1,23 @@
+table: >
+  Join table implementing the many-to-many between price_lists and ticket_types, with an explicit
+  display ordering. Grain: one row per (price_list, ticket_type) pair; a ticket type is unique
+  within a price list. Rows are managed via nested attributes on the price-list admin form and
+  destroyed with their price list. Default sales-page ordering is display_order ASC then
+  ticket_type_id DESC. Synced incrementally (upsert on id + created_at; rows never deleted from
+  BQ).
+columns:
+  id: >
+    Primary key (INT64). Surrogate key for the join row. Part of the pipeline MERGE key (id +
+    created_at).
+  display_order: >
+    Integer sort position of the ticket type within the price list (ascending; ties broken by
+    ticket_type_id descending). NOT NULL, default 0.
+  price_list_id: >
+    Foreign key -> price_lists.id. NOT NULL. The owning price list.
+  ticket_type_id: >
+    Foreign key -> ticket_types.id. NOT NULL. The ticket type offered on this price list; unique
+    per price list.
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.

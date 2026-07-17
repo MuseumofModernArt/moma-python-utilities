@@ -1,0 +1,22 @@
+table: >
+  Join table restricting ticket types to holders of specific Salesforce membership products:
+  many-to-many between ticket_types and products (products identified by Salesforce id). Grain:
+  one row per (ticket_type, product) pair, unique per pair. A ticket type with no rows here is a
+  "general" ticket anyone can buy; a ticket type with rows is only eligible for account holders
+  whose active membership product sfid appears here (staff tickets are those linked to an employee
+  product). Admin-managed configuration. Synced incrementally (upsert on id + created_at; rows
+  never deleted from BQ).
+columns:
+  id: >
+    Primary key (INT64). Surrogate key for the join row. Part of the pipeline MERGE key (id +
+    created_at).
+  ticket_type_id: >
+    Foreign key -> ticket_types.id. NOT NULL. The ticket type being restricted to a product.
+  product_sfid: >
+    Foreign key -> products.sfid (Salesforce 18-char product id string; Rails belongs_to :product
+    with primary_key :sfid). NOT NULL. The membership product whose holders may buy this ticket
+    type. Join to the products table on sfid, not id.
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.

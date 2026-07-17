@@ -1,0 +1,71 @@
+table: >
+  One row per ticket order in MoMA's standalone ticketing microservice, which brokers
+  museum-admission / event ticket purchases between the Rails app (membership.moma.org, lobby/
+  kiosk, native app) and the downstream ticketing provider. This table is owned by the EXTERNAL
+  ticketing service, not the Rails app — no ActiveRecord model exists; the Rails app consumes it via
+  API wrappers (TicketingServices::Order). In Postgres it lives in the ticketing schema as
+  ticketing.orders; in BigQuery the schema prefix is flattened into the table name ticketing_orders.
+  Child rows: ticketing_tickets.order_id and ticketing_order_logs.order_id reference this table's
+  id.
+columns:
+  id: >
+    Primary key. UUID of the order in the ticketing service, stored as STRING. Referenced by
+    ticketing_tickets.order_id (tickets in the order) and ticketing_order_logs.order_id (API call
+    log).
+  status: >
+    INTEGER enum code, REQUIRED (NOT NULL). The ticketing service's order lifecycle state. The
+    string vocabulary the service exposes through its API (TicketingServices::Order constants) is:
+    'Created', 'Finalizing', 'Finalized', 'Refunding', 'PartiallyRefunded', 'Refunded', 'Canceling',
+    'Canceled', 'Converted', 'Converting'. The integer-to-label mapping is internal to the external
+    service and is NOT defined in the Rails repo — do not assume ordinal mapping; verify against data
+    before filtering on specific codes. 'Finalized' = completed purchase; 'Converted' = rebooked/
+    converted into another order.
+  customer_id: >
+    STRING, nullable. Salesforce Contact ID (sfid) of the purchaser — the Rails app looks it up via
+    Contact.find_by(sfid: order.customer_id). References the EXTERNAL Salesforce org (join to
+    moma_apps.contacts.sfid), not a local users table. NULL for guest checkouts.
+  email: >
+    STRING, nullable in the source. WARNING: the sync pipeline's source query does NOT select this
+    column (syncticketingorders.py omits it), so in BigQuery it is effectively always NULL. Use
+    customer_id -> contacts, or the order's tickets/payment records, to identify the purchaser
+    instead.
+  reservation_id: >
+    STRING, nullable. Likely the identifier of the temporary inventory reservation/hold placed in
+    the downstream ticketing provider while the order is pending payment (paired with
+    reservation_expires_at). References an EXTERNAL system, not a local table.
+  requested_items: >
+    STRING, nullable. Serialized list of the line items requested when the order was created (items
+    carry external_id, ticket_type_id, quantity, event_date). Likely a JSON array stored as a string
+    — parse with JSON functions if needed; it is STRING, not JSON type, in BigQuery.
+  created_at: >
+    TIMESTAMP. Order creation time in the ticketing service; also the MERGE partition key for the
+    sync.
+  updated_at: >
+    TIMESTAMP. Last modification time; drives the incremental sync watermark.
+  payment_id: >
+    STRING, nullable. Identifier of the payment backing this order. Likely a reference to
+    payment_service_payments.id (the payment microservice's payment UUID, stored here as a plain
+    string; no declared DB constraint). NULL for unpaid/abandoned or zero-cost orders.
+  external_id: >
+    STRING, nullable. The order's identifier in the downstream ticketing provider. References an
+    EXTERNAL system; use it to reconcile with provider exports, not to join local tables.
+  total_amount: >
+    INTEGER, nullable. Order total in integer CENTS (USD): the Rails wrapper computes
+    total_amount_in_dollars as total_amount / 100.0.
+  purchase_date: >
+    TIMESTAMP, nullable. When the order was actually purchased/finalized (distinct from created_at,
+    which may precede payment). WARNING: the sync replaces source NULLs with the sentinel
+    '3000-01-01 00:00:00' and a bug in syncticketingorders.py (uses == instead of =) fails to convert
+    it back, so in BigQuery treat timestamps of 3000-01-01 as NULL.
+  reservation_expires_at: >
+    TIMESTAMP, nullable. When the pending order's inventory hold expires if not purchased. Same
+    sentinel caveat as purchase_date: values of '3000-01-01' mean NULL (unconverted sentinel bug).
+  total_refund_amount: >
+    INTEGER, nullable. Cumulative amount refunded on the order. Likely integer CENTS (USD), matching
+    total_amount's units. Compare with total_amount to distinguish partial vs full refunds.
+  order_number: >
+    STRING, nullable. Human-facing order number shown to customers (e.g. on confirmations/receipts),
+    as opposed to the UUID id. Assigned by the ticketing service / downstream provider.
+  sales_channel: >
+    STRING, nullable. Label for the channel through which the order was placed (the value set is not
+    enumerated in the Rails repo — inspect distinct values before filtering).

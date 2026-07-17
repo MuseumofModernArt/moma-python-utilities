@@ -1,0 +1,58 @@
+table: >
+  Products inside a cart: one row per line item (a purchasable unit — membership, ticket
+  order, donation, gift membership, etc.) belonging to exactly one cart. This is a Rails STI
+  table: the `type` column names the concrete subclass and determines which keys appear in
+  the JSON `properties`/`delivery_properties` columns. Line items are created while the cart
+  is built, priced via amount_in_cents/discounted_total_in_cents (promo vouchers apply
+  discounts), and stamped `finalized` when the cart completes. Revenue analysis should
+  generally filter to finalized line items (finalized IS NOT NULL) or join to carts with
+  status IN ('finalized','delivered').
+columns:
+  id: >
+    Primary key (INT64). Join target for answers.line_item_id and the sync MERGE key.
+  type: >
+    STI discriminator: the Rails class name of the line-item kind, namespaced with '::'
+    (e.g. 'LineItems::Membership'). Subclass families found in app/models/line_items/:
+    memberships ('LineItems::Membership', 'LineItems::CorporateMembership',
+    'LineItems::ExternalMembership', 'LineItems::LobbyMembership'); gift memberships
+    ('LineItems::GiftMembership', 'LineItems::GiftMembershipPurchase',
+    'LineItems::GiftMembershipBatchPurchase', 'LineItems::GiftMembershipRedemption',
+    'LineItems::ExternalGiftMembership', 'LineItems::LobbyGiftMembership'); ticket orders
+    ('LineItems::TicketOrder', 'LineItems::EventTicketOrder', 'LineItems::FilmTicketOrder',
+    'LineItems::GeneralAdmissionTicketOrder', 'LineItems::OnlineTicketOrder',
+    'LineItems::UniqloTicketOrder', and kiosk variants); and donations/contributions
+    ('LineItems::Donation', 'LineItems::SpecialEventContribution',
+    'LineItems::SpecialEventDonation'). Abstract base classes are not stored as row types.
+  quantity: >
+    Number of units for this line item (e.g. ticket count). Required by the model. Unit price
+    is amount_in_cents; extended pre-discount total = amount_in_cents * quantity.
+  amount_in_cents: >
+    Unit price in integer USD cents (per single unit, NOT the line total — multiply by
+    quantity for the pre-discount total).
+  discounted_total_in_cents: >
+    Line TOTAL after promo/voucher discounts, in integer USD cents. Nullable in the DB: NULL
+    means no discount was applied and the effective total is amount_in_cents * quantity (the
+    model falls back to that). Use COALESCE(discounted_total_in_cents, amount_in_cents *
+    quantity) for revenue.
+  cart_id: >
+    Foreign key -> carts.id. The cart/checkout this line item belongs to (belongs_to :cart,
+    required). Join here to get purchaser (contact_id), channel (admin_user_id), and cart
+    status.
+  created_at: >
+    Timestamp the line item was added to the cart. Also the sync MERGE partition column.
+  updated_at: >
+    Timestamp of the last update to the row.
+  finalized: >
+    TIMESTAMP (not a boolean despite the name): when the line item was finalized as part of
+    cart completion (subclasses set it to now during finalization). NULL means never
+    finalized — i.e. the sale did not complete for this item. Filter finalized IS NOT NULL
+    for completed sales.
+  properties: >
+    JSON (jsonb) bag of subclass-specific attributes accessed via Rails store_accessor; keys
+    vary by `type` (e.g. purchaser name/email/address fields and auto_renew for memberships,
+    'order_id' linking ticket orders to the ticketing system, one_time_purchase_token_id,
+    donation options). Query with JSON functions, e.g. JSON_VALUE(properties, '$.order_id').
+  delivery_properties: >
+    JSON (jsonb) of fulfillment/delivery options, keys vary by subclass: ticket orders use
+    emails, send_email, location, print, ticket_printer, subscribe; special-event and
+    event-ticket items use send_email. NULL/empty for item types without delivery options.

@@ -62,6 +62,7 @@ Because MERGE and status queries assume a `created_at` column and `id` key, new 
    "Record Schema" fills `class Record(typing.NamedTuple)`; "Transfer Schema" fills `bq_table_schema['fields']`. (Note: `schema-maker.py`'s regex is hardcoded to the `moma-membership.moma_import` project and a `TYPE_CONVERSION` map that may need extending for new BQ types.) `bq_table_schema` mode is `REQUIRED` for `NOT NULL` columns, `NULLABLE` otherwise. Postgres→Python types: text/uuid→`str`, int/bigint→`int`, boolean→`bool`, time/date/timestamp→`datetime.datetime`, jsonb→`dict`, array→`list`.
 3. Write `sync<table>.py` following an existing module like `synccarts.py`. The `pg_source_query` should end with `WHERE updated_at >= timestamp '{begin.isoformat()}';`.
 4. Add the dispatch `case` to `__init__.py` (generate with `python moma/pipelines/scripts/case-maker.py <table>`), then verify the `make_runner(...)` argument matches the class name in the sync file.
+5. Add `moma/pipelines/descriptions/<bq_table_name>.yaml` documenting the table and every column (see "Table & column descriptions" below).
 
 ### Type-casting conventions in pipelines
 
@@ -85,7 +86,33 @@ Do **not** re-run the full schema file (it would drop data). Instead: add the co
 ```sql
 DELETE FROM `<temp_project>.moma_import.pipeline_status` WHERE name = 'import-<table-name>'
 ```
-(run against both `moma-apps-staging` and `moma-membership`).
+(run against both `moma-apps-staging` and `moma-membership`). Also add the new column to
+`moma/pipelines/descriptions/<table>.yaml`.
+
+### Table & column descriptions (data dictionary)
+
+BigQuery table/column `description` metadata for the destination tables is authored in a YAML
+data dictionary and applied non-destructively — it exists so an AI/analyst querying the tables
+has semantic context (what tables mean, enum/status vocabularies, money units, and how
+primary/foreign keys join).
+
+- **Source of truth:** `moma/pipelines/descriptions/<bq_table_name>.yaml`, one file per synced
+  table, shaped as `table: <paragraph>` + `columns: {<col>: <text>}`. The file name and column
+  keys must match the sync module's `bq_table_name` and `Record._fields` exactly. Descriptions
+  are prose only — they carry no schema/type info and never affect the pipeline run.
+- **Apply tool:** `moma/pipelines/scripts/apply-descriptions.py` pushes descriptions into the
+  destination tables that analysts query (`moma-dw.moma_apps` and `moma-dw.moma_apps_staging`;
+  the transient `moma_import.*` tables are intentionally skipped). It only updates `description`
+  metadata via `Client.update_table(..., ["description", "schema"])` — it never creates, drops,
+  truncates, or repartitions anything.
+  - `--check` — validate the YAML against the sync modules (columns present, non-empty, within
+    BigQuery's 1024-char column limit). Runs fully locally (only needs PyYAML); no credentials.
+  - `--env staging|production --dry-run` — read the live schema and print what would change.
+  - `--env staging` then, after review, `--env production` — apply for real (needs `gcloud`
+    application-default credentials with BigQuery write access to `moma-dw`).
+- **Workflow when adding/changing a column:** update the table's YAML, run `--check`, then apply
+  per env. Descriptions are NOT set by the `bq-schemas/*.sql` DDL, so a `CREATE OR REPLACE` of a
+  table drops them — re-run `apply-descriptions.py` for that env afterward.
 
 ## Environments and deployment
 

@@ -1,0 +1,63 @@
+table: >
+  One row per gift-membership order/checkout detail record — the "gift" side of an online
+  membership checkout (checkouts.gift_id points here). Where a giftable is a redeemable voucher
+  code, a gifts row holds the fulfillment details of a directly-gifted membership: the named
+  recipients (gift_recipients/cardholders attach polymorphically with checkout_type='Gift'), the
+  address and phone captured at checkout, the requested start date, and the resulting membership
+  dates once finalized against a Salesforce account. Rows with both account ids NULL are pending/
+  unfinalized checkouts; the app treats rows older than 30 days with no account and no expiration
+  as abandoned. Grain: one gift order (which may cover a primary + secondary cardholder, per
+  tier).
+columns:
+  id: >
+    Primary key (INT64, BIGINT surrogate). Part of the BigQuery MERGE key (id + created_at).
+  address_1: >
+    Street address line 1 captured at gift checkout (NOT NULL in Postgres; the checkout UI labels
+    this section "Billing address" for gift purchases). Likely the purchaser's billing address
+    used as the order address sent to fulfillment.
+  address_2: >
+    Street address line 2 (apt/suite). Nullable.
+  city: >
+    Address city. NOT NULL.
+  state: >
+    Address state/region. Nullable (non-US addresses may omit it).
+  country_code: >
+    ISO country code of the address; defaults to 'US'. NOT NULL. Also used to normalize
+    phone_number.
+  zip: >
+    Postal code. NOT NULL.
+  created_at: >
+    Row creation timestamp (Rails-managed, NOT NULL). Part of the BigQuery MERGE key.
+  updated_at: >
+    Last update timestamp (Rails-managed, NOT NULL); drives incremental sync.
+  phone_number: >
+    Contact phone, normalized to E.164 using country_code (phony_normalize). Nullable.
+  gift_start_date: >
+    Date the gifter requested the membership to start / be delivered (form label "Membership
+    delivery date"). Validated at purchase to be between today and end of next month. NOT NULL,
+    defaults to now(). Renewal expiry is computed as end of this month + 1 year.
+  gift_expiration_date: >
+    Expiration date of the resulting gifted membership. NULL until the gift is finalized — the
+    app's "abandoned" heuristic requires this to be NULL.
+  fallback_account_id: >
+    STRING Salesforce join used when the sfid is not yet known: joins
+    sf.account.account_external_id__c (the account external id, NOT sfid). The app resolves
+    gift.account as account_id's account first, falling back to this. Nullable; NULL together with
+    account_id means the gift is still pending.
+  notification_email_sent_on: >
+    Date the first giftee confirmation/notification email was sent (set by
+    GifteeFirstConfirmationJob). NULL if not yet sent.
+  token: >
+    Unique random secure token (Rails has_secure_token), used to reference the gift in emailed
+    links. NOT NULL.
+  notification_email_second_sent_on: >
+    Date the second (reminder) giftee notification email was sent. NULL if not sent.
+  notification_email_third_sent_on: >
+    Date the third (final reminder) giftee notification email was sent. NULL if not sent.
+  membership_start_date: >
+    Actual start date of the created membership once processed. Confirmation emails use this,
+    falling back to gift_start_date when NULL.
+  account_id: >
+    STRING(18) Salesforce sfid of the gift recipient's membership Account: joins sf.account.sfid.
+    Set on finalization (assigned together with fallback_account_id from the same Account). NULL
+    while the gift checkout is pending.

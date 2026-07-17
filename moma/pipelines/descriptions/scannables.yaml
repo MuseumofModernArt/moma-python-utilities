@@ -1,0 +1,35 @@
+table: >
+  QR-code registry: one row per QR code attached to an admittable record. Grain: one row per
+  scannable (id); each owning record gets at most one (has_one :qr_code). This is a Rails
+  POLYMORPHIC join: scannable_type names the owning model class and scannable_id identifies the
+  owning row — owners found in source: 'EventTicket', 'MembershipCard', 'SpecialEventTicket',
+  'VirtualQueueParticipant', 'TicketingServices::PurchasedTicket',
+  'LineItems::SpecialEventContribution'. The uuid is the payload encoded into the QR image (as
+  JSON with scannable_type) that scanners look up at the door; scans against a code are logged in
+  scannable_events (scannable_events.scannable_id -> scannables.id). Do NOT confuse this table's
+  scannable_id (polymorphic pointer OUT to the owner) with scannable_events.scannable_id (FK IN to
+  this table's id). Upsert-only incremental sync.
+columns:
+  id: >
+    Primary key of the scannable/QR-code record (INT64). MERGE/upsert key for the sync. Join
+    target for scannable_events.scannable_id.
+  uuid: >
+    UUID string (STRING, NOT NULL in source; cast uuid::text by the pipeline, generated if
+    absent). The identifier embedded in the QR code image; scanning devices resolve a code to this
+    row via uuid + scannable_type.
+  scannable_id: >
+    Polymorphic owner id (STRING — note it is character varying in source, not an integer): the id
+    of the row in the table named by scannable_type. Join to <owner_table>.id after filtering on
+    scannable_type (cast as needed since this column is a string). Exception: when
+    scannable_type='MembershipCard' this holds the card's external Salesforce id
+    (card_external_id__c), not a local numeric id.
+  scannable_type: >
+    Polymorphic owner class name (STRING, NOT NULL). Values found in source code: 'EventTicket',
+    'MembershipCard', 'SpecialEventTicket', 'VirtualQueueParticipant',
+    'TicketingServices::PurchasedTicket', 'LineItems::SpecialEventContribution'. Always pair with
+    scannable_id when joining to the owner table.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL) — when the QR code was generated. Part of the
+    sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.

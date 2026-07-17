@@ -1,0 +1,18 @@
+table: >
+  Named menus of ticket types offered for sale on ticketed events. Grain: one row per price list.
+  Each event points at one price list (events.price_list_id, nullified if the list is deleted);
+  the list's ticket types and their display order come from price_lists_ticket_types. Price lists
+  are admin-managed configuration and can be cloned ("<name> Clone"). Synced incrementally (upsert
+  on id + created_at; rows never deleted from BQ).
+columns:
+  id: >
+    Primary key (INT64). Join target for events.price_list_id and
+    price_lists_ticket_types.price_list_id. Part of the pipeline MERGE key (id + created_at).
+  name: >
+    Admin-facing name of the price list. NOT NULL.
+  description: >
+    Optional free-text description. Nullable.
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.

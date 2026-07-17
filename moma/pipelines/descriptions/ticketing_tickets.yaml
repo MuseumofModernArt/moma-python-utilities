@@ -1,0 +1,61 @@
+table: >
+  One row per individual ticket (one admission for one person on one date) belonging to an order in
+  MoMA's standalone ticketing microservice. Owned by the EXTERNAL ticketing service, not the Rails
+  app — no ActiveRecord model; the Rails app sees these via API payloads (TicketingServices::Ticket
+  / PurchasedTicket wrappers). In Postgres it lives in the ticketing schema as ticketing.tickets; in
+  BigQuery the schema prefix is flattened into the table name ticketing_tickets. Declared FK:
+  order_id -> ticketing_orders.id. Note: the catalog ids on this table (ticket_type_id, event_id,
+  template_id) belong to the external ticketing service / its downstream provider, NOT to the Rails
+  app's local moma_apps.ticket_types or moma_apps.events tables — do not join them locally.
+columns:
+  id: >
+    Primary key. UUID of the ticket in the ticketing service, stored as STRING.
+  ticket_type_id: >
+    STRING, REQUIRED (NOT NULL). Identifier of the ticket type in the EXTERNAL ticketing service's
+    own catalog. NOT a FK to the local moma_apps.ticket_types table.
+  name: >
+    STRING, nullable. Display name of the ticket type (e.g. 'Adult', which the Rails app
+    special-cases). Copied from the catalog at purchase time.
+  description: >
+    STRING, nullable. Ticket type description copied from the external catalog.
+  type_of_ticket: >
+    STRING, nullable. Ticket kind/category label; exposed as "type" in the service's API payloads.
+    Value set is defined by the external service and not enumerated in the Rails repo.
+  price: >
+    INTEGER, REQUIRED. Per-ticket price in integer CENTS (USD): the Rails wrapper computes
+    price_in_dollars as price / 100.0. Refund line items use this same cents value.
+  ticket_number: >
+    STRING, nullable. Human-facing ticket number issued by the ticketing service/provider; printed
+    on the ticket and used when requesting refunds.
+  barcode: >
+    STRING, nullable. Scannable barcode value for admission; the Rails app builds QR codes from it
+    and records check-in scans against it.
+  date: >
+    STRING, nullable. Visit/event date the ticket is valid for, stored as an ISO 8601 'YYYY-MM-DD'
+    string (the Rails app compares it to Date.current.iso8601 at scan time). It is a STRING, not a
+    DATE — cast with PARSE_DATE('%Y-%m-%d', date) for date arithmetic.
+  status: >
+    INTEGER enum code, nullable. Ticket state. The string vocabulary the service's API exposes
+    (TicketingServices::PurchasedTicket constants) is: 'Normal' (valid/active) and 'Refunded'. The
+    integer-to-label mapping is internal to the external service and not defined in the Rails repo —
+    verify against data before filtering on specific codes.
+  order_id: >
+    UUID stored as STRING, REQUIRED. Declared FK -> ticketing_orders.id; many tickets per order. Join
+    key for order-level attributes (purchaser, totals, sales_channel).
+  created_at: >
+    TIMESTAMP. Row creation time in the ticketing service; MERGE partition key for the sync.
+  updated_at: >
+    TIMESTAMP. Last modification time; drives the incremental sync watermark (e.g. bumps on refund).
+  external_order_item_id: >
+    STRING, nullable. Identifier of the corresponding order line item in the downstream ticketing
+    provider. References an EXTERNAL system, not a local table.
+  external_id: >
+    STRING, nullable. The ticket's identifier in the downstream ticketing provider. References an
+    EXTERNAL system; use for reconciliation with provider data.
+  event_id: >
+    STRING, nullable. Identifier of the event/timeslot this ticket admits to, in the EXTERNAL
+    ticketing service / downstream provider's catalog. NOT a FK to the local moma_apps.events table.
+  template_id: >
+    STRING, nullable. Likely the ticket template identifier in the external service/provider (API
+    payloads carry template_id alongside template_name), controlling ticket rendering/format.
+    References an EXTERNAL system.

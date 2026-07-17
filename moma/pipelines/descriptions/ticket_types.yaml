@@ -1,0 +1,81 @@
+table: >
+  Catalog of purchasable admission ticket types for timed museum events (managed in the Rails
+  admin of membership.moma.org). One row per ticket type definition (e.g. Adult, Member, Child,
+  Care Partner variants); grain: one ticket type. Ticket types are grouped into
+  ticket_type_categories, offered on events via price_lists (through price_lists_ticket_types),
+  optionally gated to Salesforce membership products via ticket_types_products, and are the
+  template from which event_tickets rows are stamped at reservation time (name, ticket_identifier,
+  price_in_cents are snapshotted onto each event_ticket). Rows are long-lived configuration data;
+  deletion is blocked once event_tickets reference them. Synced incrementally (upsert on id +
+  created_at window; rows never deleted from BQ).
+columns:
+  id: >
+    Primary key (INT64). Join target for event_tickets.ticket_type_id,
+    price_lists_ticket_types.ticket_type_id, and ticket_types_products.ticket_type_id. Part of the
+    pipeline MERGE key (id + created_at).
+  name: >
+    Public display name of the ticket type shown to purchasers (e.g. on ticketing pages and
+    receipts). NOT NULL. Copied onto event_tickets.name at reservation.
+  caption: >
+    Optional descriptive subtitle/caption shown under the name on sales pages. Nullable.
+  price_in_cents: >
+    Sale price in integer US cents (e.g. 3000 = $30.00). NOT NULL, default 0, must be >= 0.
+    Snapshotted onto event_tickets.price_in_cents at reservation.
+  ticket_identifier: >
+    Short label/identifier for the ticket class (e.g. printed/emailed ticket wording; pluralized
+    in confirmation emails). NOT NULL. Copied onto event_tickets.identifier at reservation — join
+    event_tickets.identifier back to this value for snapshot comparisons.
+  visible: >
+    Boolean; true = ticket type is shown/sellable on public sales channels. Default true. A ticket
+    type cannot be both comp and visible (model validation).
+  comp: >
+    Boolean; true = complimentary (free/comped) ticket type. Default false. Comp types ignore
+    event capacity and are excluded from "active" ticket counts; mutually exclusive with visible.
+  prior_days_can_sell_tickets: >
+    Integer number of days before the event date that sales open: purchasable when current date >=
+    event_date - N days. NULL = no advance-window restriction (always sellable up to the event
+    date).
+  event_user_max_quantity: >
+    Integer per-user purchase cap for this ticket type per event (already-purchased tickets count
+    against it). NULL = no per-user limit.
+  adult_ticket: >
+    Boolean; true = this type counts as an adult ticket, satisfying other types'
+    require_adult_ticket restriction. Default true.
+  require_adult_ticket: >
+    Boolean; true = orders containing this type must also include at least one adult_ticket type
+    (i.e. this is a child-style ticket; maps to RESTRICTION_TYPES 'child'). Default false.
+  member_ticket: >
+    Boolean; true = this type counts as a member ticket (RESTRICTION_TYPES 'member'), satisfying
+    require_member_ticket restrictions. Default false.
+  require_member_ticket: >
+    Boolean; true = orders containing this type must also include at least one member_ticket type
+    (member-guest ticket; RESTRICTION_TYPES 'member_guest'). Default false.
+  care_partner: >
+    Boolean; true = this is a care-partner (companion) ticket (RESTRICTION_TYPES 'care_partner');
+    the count of care_partner tickets in an order may not exceed the count of permit_care_partner
+    tickets. Default false.
+  permit_care_partner: >
+    Boolean; true = each ticket of this type permits one accompanying care_partner ticket in the
+    same order. Default false.
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / BigQuery partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.
+  internal_name: >
+    Admin-facing internal name (required by model validation) used to distinguish ticket types
+    when the public name is not unique. Nullable in the DB.
+  ticket_type_category_id: >
+    Foreign key -> ticket_type_categories.id (belongs_to, required by the model; column nullable in
+    DB). Categories drive per-event, per-category quantity limits and capacity settings.
+  tax_deductible_amount_in_cents: >
+    Tax-deductible portion of the price in integer US cents. NOT NULL, default 0; constrained to
+    0..price_in_cents.
+  general_ledger_account: >
+    GL account code string sent to the finance/Heroku transaction payloads for sales and refunds
+    of this ticket type. Nullable.
+  general_ledger_designation: >
+    GL designation code string accompanying general_ledger_account in finance payloads. Nullable.
+  require_child_ticket: >
+    Boolean; true = orders containing this type must also include at least one ticket of a type
+    with require_adult_ticket = true (i.e. must include a child ticket; RESTRICTION_TYPES
+    'require_child'). Default false.

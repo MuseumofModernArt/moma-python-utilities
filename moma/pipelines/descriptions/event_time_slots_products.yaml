@@ -1,0 +1,22 @@
+table: >
+  Join table linking member-only event time slots to the Salesforce membership products whose
+  holders are eligible to book them. Grain: one row per (event_time_slot, Salesforce product)
+  pair; uniqueness of product within a slot is validated in the app. Used by eligibility checks:
+  for a member_only slot, an account holder qualifies if their account's membership product sfid
+  appears here for the slot (staff qualify via an employee product). Rows are created/edited by
+  admins when configuring slots and are destroyed with their slot in the source; BigQuery keeps
+  deleted rows (upsert-only sync).
+columns:
+  id: >
+    Primary key of the join row (INT64). MERGE/upsert key for the sync.
+  event_time_slot_id: >
+    Foreign key -> event_time_slots.id (INT64, NOT NULL). The time slot this eligibility rule
+    applies to. Many rows per slot are possible (one per eligible product).
+  product_sfid: >
+    Salesforce product identifier (STRING, NOT NULL): a Salesforce record ID joining to the
+    products reference (Rails belongs_to :product with primary_key: :sfid). Identifies a
+    membership (or employee) product whose holders may book the slot.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL). Part of the sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.

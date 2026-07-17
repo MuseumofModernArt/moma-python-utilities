@@ -1,0 +1,55 @@
+table: >
+  Refund requests issued against collected payments: one row per refund attempt on a
+  payment_detail, created by staff (issued_by) with a categorized reason, tracked through an
+  AASM status machine as the payment service processes it. Carries idempotency protection, the
+  refunded ticket numbers, and an itemized JSON snapshot of what was refunded. Money returned =
+  amount_in_cents on rows whose status reached 'refunded' or 'completed'.
+columns:
+  id: >
+    Primary key: a UUID, stored as STRING in BigQuery (Postgres uuid, gen_random_uuid()
+    default). Sync MERGE key for this table.
+  payment_detail_id: >
+    Foreign key -> payment_details.id. The collected payment being (partially) refunded
+    (belongs_to :payment_detail, required). Join through payment_details to carts for the
+    original order. A payment can have multiple refunds (partial refunds).
+  idempotency_key: >
+    Client-generated key ensuring the refund is submitted to the payment provider at most
+    once; required by the model. Duplicate submissions reuse the same key.
+  amount_in_cents: >
+    Refund amount in integer USD cents (required by the model; nullable in DB). For partial
+    refunds this is less than the payment's amount_in_cents.
+  status: >
+    Refund lifecycle state (AASM). Exact allowed values: 'initial', 'pending', 'refunded',
+    'completed', 'failed'. Flow: initial -> pending (request received by PSP) -> refunded (PSP
+    confirmed the refund) -> completed; 'failed' from initial/pending. Count only
+    'refunded'/'completed' rows as money actually returned.
+  ticket_numbers: >
+    JSON array of the ticket numbers/ids being refunded (used to void the corresponding event
+    tickets and drive refund-confirmation emails). NULL/empty for non-ticket refunds.
+  line_items: >
+    JSON array of itemized refund line objects (serialized Refund::LineItem structs) with keys:
+    id, amount_excluding_tax, amount_including_tax, description, ticket_id, image_url,
+    item_category, product_url, quantity, tax_amount, tax_percentage. Note: this is a JSON
+    snapshot, NOT a foreign key to the line_items table. Required unless the refund was
+    explicitly allowed to be empty.
+  created_at: >
+    Timestamp the refund request was created. Also the sync MERGE partition column.
+  updated_at: >
+    Timestamp of the last update (AASM timestamps state transitions).
+  additional_notes: >
+    Free-text notes entered by the staff member issuing the refund. Nullable.
+  reason: >
+    Refund reason category, stored as the Rails enum's INTEGER ordinal. Exact mapping from the
+    model: 0='payment', 1='cancelled_event', 2='rebook_event', 3='miscellaneous',
+    4='kiosk_error', 5='visitor_error', 6='pos_error', 7='recovery', 8='security',
+    9='wrong_ticket_type', 10='could_not_attend', 11='internal_testing'. Decode with a CASE
+    expression in SQL.
+  issued_by: >
+    Email address of the staff member who issued the refund (validated as an email by the
+    model).
+  customer_email: >
+    Customer's email address the refund confirmation is sent to; normalized to lowercase/trimmed
+    before save. Nullable.
+  cc_email: >
+    Additional email address CC'd on the refund confirmation; normalized to lowercase/trimmed.
+    Nullable.

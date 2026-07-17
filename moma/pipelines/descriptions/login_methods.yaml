@@ -1,0 +1,24 @@
+table: >
+  Authentication identities attached to public user accounts (Rails model LoginMethod). One row
+  per external auth identity (Auth0 / OAuth) linked to a user; a user can have several (has_many
+  :login_methods on users, dependent: :destroy — rows are removed in the source when the user is
+  deleted, though the BigQuery sync never deletes). Rows are created when a user connects or first
+  signs in with an identity provider. Contains credential-adjacent data: treat oauth_token and
+  auth0_reference as sensitive and avoid surfacing raw values in query output.
+columns:
+  id: >
+    INT64 primary key (Postgres bigserial).
+  oauth_token: >
+    Nullable OAuth token/reference string associated with this login identity. Sensitive
+    credential material — do not expose in results.
+  auth0_reference: >
+    The Auth0 identifier for this identity (e.g. an Auth0 user id); required by application
+    validation (presence-validated and indexed in the source), though the column itself is
+    nullable in the schema. Sensitive identifier.
+  user_id: >
+    FK -> users.id (belongs_to :user, presence-validated; many login_methods per user). Nullable
+    in the schema but effectively always set. Join to users to resolve the account owner.
+  created_at: >
+    Timestamp the login method was linked to the user (BigQuery partition/merge column).
+  updated_at: >
+    Timestamp the row was last modified in the source; drives the incremental sync.
