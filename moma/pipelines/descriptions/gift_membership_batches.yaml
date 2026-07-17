@@ -1,0 +1,42 @@
+table: >
+  One row per admin-created batch ("packet") of gift-membership voucher codes. An admin picks a
+  membership product, a code count, and an expiry; on create the app generates that many giftables
+  rows linked to the batch (status 'generated', or 'purchased' immediately if bulk_salesforce_id
+  is present, i.e. the batch was bulk-sold and recorded in Salesforce). Updating expires_at
+  cascades to all non-expired child giftables; setting/clearing bulk_salesforce_id flips child
+  codes between generated and purchased. Batches flagged available_in_mla and still holding unsold
+  generated codes are sellable in the Membership Lobby App. Owned by the admin/back-office side of
+  the membership app.
+columns:
+  id: >
+    Primary key (INT64, BIGINT surrogate). Join target for giftables.gift_membership_batch_id and
+    gift_membership_batch_sales.gift_membership_batch_id. Part of the MERGE key (id + created_at).
+  batch_name: >
+    Human-readable admin-assigned name of the batch. NOT NULL; searched together with the product
+    name in the admin UI.
+  product_sfid: >
+    STRING Salesforce id of the membership product being gifted: joins sf.product2.sfid (Rails
+    belongs_to :product with primary_key sfid). NOT NULL. Determines the tier and unit price of
+    every code in the batch.
+  amount: >
+    Number of gift codes to generate in this batch — an integer COUNT, not money (validated
+    integer > 0; generation creates `amount` giftables). NOT NULL.
+  expires_at: >
+    Expiry timestamp applied to every giftable in the batch. NOT NULL. Changing it updates all
+    child giftables not already expired.
+  admin_user_id: >
+    Logical foreign key -> admin_users.id (no DB constraint): the back-office admin who created the
+    batch. NOT NULL.
+  created_at: >
+    Row creation timestamp (Rails-managed, NOT NULL). Part of the BigQuery MERGE key.
+  updated_at: >
+    Last update timestamp (Rails-managed, NOT NULL); drives incremental sync.
+  available_in_mla: >
+    Boolean, default true, NOT NULL. True means the batch is offered for sale in the MLA — the
+    Membership Lobby App, MoMA's in-lobby membership sales application (admin UI label "Show in
+    MLA") — provided it still has unsold 'generated' codes. Admins toggle it to hide/show the
+    packet.
+  bulk_salesforce_id: >
+    STRING Salesforce id recording a bulk sale of the whole batch in Salesforce. Nullable. When
+    present, the batch's codes are created as / moved to status 'purchased'; clearing it reverts
+    purchased codes to 'generated'.

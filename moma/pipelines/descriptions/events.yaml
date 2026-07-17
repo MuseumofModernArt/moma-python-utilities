@@ -1,0 +1,94 @@
+table: >
+  Ticketed events sold on membership.moma.org (films, performances, member events, etc.), managed
+  by MoMA admin staff in the Rails membership/ticketing app. One row per event (grain: events.id).
+  An event is the sales container: capacity and scheduling live in child event_time_slots rows,
+  pricing comes from the linked price_lists row, per-category purchase caps live in
+  events_ticket_type_categories, and sold tickets reference the event via
+  event_tickets.event_time_slot_id. Rows are created when staff configure an event and updated
+  throughout its life; an event is archived once start_date is in the past and "turned off" once
+  turn_off_date has passed. Synced incrementally (upsert-only, never deleted). The BigQuery table
+  carries a subset of the source columns (page copy/webhook/config fields are omitted). Distinct
+  from special_events (fundraising benefits/galas).
+columns:
+  id: >
+    Primary key of the event (INT64). MERGE/upsert key for the sync. Join target for
+    event_time_slots.event_id and events_ticket_type_categories.event_id (but see those tables:
+    their event_id is polymorphic and can also reference event templates).
+  slug: >
+    URL slug identifying the event's public purchase page (NOT NULL, unique per event). Defaults
+    to the parameterized name if not set by staff.
+  name: >
+    Internal/administrative event name. Used as the public title only when title_enabled is false
+    or title is blank. Nullable.
+  cart_timeout_in_minutes: >
+    Minutes a shopping cart holding tickets for this event stays reserved before it expires and
+    the held tickets are released. Integer >= 1; source default 30. NOT NULL.
+  salesforce_campaign: >
+    Salesforce Campaign identifier (STRING, Salesforce ID) that orders/tickets for this event are
+    attributed to in Salesforce. Nullable.
+  order_quantity_limit: >
+    Maximum number of tickets allowed in a single order for this event. Nullable; when NULL the
+    app falls back to a global max ticket quantity constant.
+  emarsys_event_id: >
+    Key of the Emarsys external event used to trigger the purchase/payment-confirmation email for
+    this event. STRING, nullable; blank means no confirmation email trigger configured.
+  turn_off_date: >
+    TIMESTAMP after which online sales for the event are shut off (event.over? is true once
+    turn_off_date <= now). Nullable; NULL means sales are never auto-disabled.
+  contact_us_error_msg: >
+    Custom error/contact message text shown to purchasers when something goes wrong during
+    checkout for this event. Nullable free text.
+  location: >
+    Free-text venue/location of the event (e.g. a theater or gallery at MoMA). Nullable.
+  exhibition: >
+    Free-text name of the exhibition the event is associated with, if any. Nullable.
+  title: >
+    Public-facing display title of the event page; only used when title_enabled is true
+    (otherwise name is displayed). Nullable.
+  title_enabled: >
+    BOOL; true means the public event page displays the title column instead of name. Nullable in
+    source (NULL effectively behaves as false).
+  start_date: >
+    Date the event takes place. Stored in BigQuery as a NULLABLE TIMESTAMP at midnight (source is
+    a Postgres date). Drives archiving: events with start_date < current date are archived; also
+    anchors when tickets may be scanned or sold.
+  start_time: >
+    Event start as a full TIMESTAMP: the pipeline combines source start_date + the time-of-day
+    start_time column, so this is the event's start datetime, not a bare time. NULL when the
+    source time-of-day is NULL (date-only events). Prefer this over start_date when you need the
+    actual start moment.
+  hero_image_url_enabled: >
+    BOOL; true means the event page displays the hero image at hero_image_url. Nullable.
+  hero_image_url: >
+    URL of the hero/banner image for the event page. Nullable; only shown when
+    hero_image_url_enabled is true.
+  non_refundable_copy: >
+    Copy shown to purchasers about the non-refundable nature of the purchase. Nullable STRING with
+    a default about the purchase being non-refundable.
+  require_mailing_address: >
+    BOOL, NOT NULL, source default true; true means checkout for this event requires the purchaser
+    to provide a mailing address.
+  require_phone_number: >
+    BOOL, NOT NULL, source default true; true means checkout requires a phone number.
+  reminder_email_enabled: >
+    BOOL, NOT NULL, source default false; true means pre-event reminder emails are enabled for
+    this event.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL). Also part of the sync's MERGE partition-window
+    predicate.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL). Drives the incremental sync watermark.
+  price_list_id: >
+    Foreign key -> price_lists.id (INT64, nullable; optional belongs_to). The price list supplies
+    the ticket_types (and their prices) sellable for this event; an event with no price list, or
+    whose ticket types are all zero-priced, is treated as free.
+  event_type: >
+    Event category. Allowed values (Rails EVENT_TYPES constant): 'Film', 'Performance',
+    'Membership', 'Other'. Nullable STRING; 'Film' gets distinct handling in the app.
+  allow_museum_admission: >
+    BOOL, source default false; true means tickets for this event may also be scanned in
+    museum_admission mode (an event ticket doubles as general museum admission), in addition to
+    the default event_admission scan mode. Nullable.
+  reminder_emarsys_event_id: >
+    Key of the Emarsys external event used to trigger the reminder email for this event. STRING,
+    nullable.

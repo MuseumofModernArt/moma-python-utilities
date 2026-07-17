@@ -1,0 +1,41 @@
+table: >
+  Timed entry slots for events: each row is one bookable time window with its own capacity. Grain:
+  one row per time slot (id); an event usually has one or more slots. Tickets are sold against a
+  slot (event_tickets.event_time_slot_id), and slot capacity (max_quantity) is what sold-out logic
+  counts against. IMPORTANT: the association to the parent is polymorphic in Rails (belongs_to
+  :event, polymorphic) — source rows belong to either an Event or an EventTemplate (the reusable
+  template used to clone events); the discriminator column event_type ('Event' / 'EventTemplate')
+  exists in Postgres but is NOT synced to this BigQuery table, so a plain join of event_id to
+  events.id can also pull in template slots whose event_id is actually an event_templates id.
+  Slots may be restricted to members via member_only plus linked Salesforce membership products in
+  event_time_slots_products. Upsert-only incremental sync; rows deleted in the source remain in
+  BigQuery.
+columns:
+  id: >
+    Primary key of the time slot (INT64). MERGE/upsert key for the sync. Join target for
+    event_time_slots_products.event_time_slot_id and event_tickets.event_time_slot_id.
+  event_id: >
+    Polymorphic foreign key (INT64, NOT NULL): the id of the owning record, which is events.id
+    when the source row's event_type is 'Event', or an event_templates id when it is
+    'EventTemplate'. The event_type discriminator is not present in this BigQuery table, so treat
+    joins to events as "events.id join, may include template rows with colliding ids". For
+    sold-ticket analysis this is effectively events.id, since tickets only exist for real events.
+  max_quantity: >
+    Capacity of this slot: maximum number of active tickets that can be sold/held for it. Integer,
+    nullable in source but defaulted by the app to 99999 (a sentinel meaning effectively
+    unlimited); available quantity = max_quantity minus active + validly reserved tickets.
+  start_time: >
+    Slot start as a TIMESTAMP (for real events the app treats its time-of-day combined with the
+    event's start_date as the slot's start datetime; defaults to beginning of day when staff don't
+    set one). Present in practice (validated present).
+  end_time: >
+    Slot end as a TIMESTAMP; must be after start_time (validated). Defaults to end of day when not
+    set by staff.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL). Part of the sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.
+  member_only: >
+    BOOL, NOT NULL, default false. True means only account holders with an active membership whose
+    membership product is linked to this slot (via event_time_slots_products.product_sfid), or
+    staff with an employee product, may purchase tickets in this slot.

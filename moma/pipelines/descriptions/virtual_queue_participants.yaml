@@ -1,0 +1,89 @@
+table: >
+  One row per party (guest signup) in a virtual queue — a person plus their group ('slots'
+  people) waiting for timed entry to an exhibition. Child of virtual_queues (virtual_queue_id
+  FK). Created when a visitor signs up online or staff manually enqueue them; the row then moves
+  through an AASM state machine on the status column (queued -> notified -> visiting -> left, or
+  terminal cancelled / unserved / sms_undeliverable), with per-state timestamp columns stamped at
+  each transition. Serving order is priority DESC, then created_at ASC (FIFO within a priority
+  tier). Participants may be anonymous (user_id NULL) since queue signup does not require a
+  membership account. Each participant also gets a QR code (scannable) for admission scanning.
+columns:
+  id: >
+    Primary key (bigint sequence).
+  first_name: >
+    Participant's first name as entered at signup. Required in the app except for manually
+    entered (staff walk-up) records, so can be NULL.
+  last_name: >
+    Participant's last name as entered at signup. Same nullability caveat as first_name.
+  email: >
+    Contact email for queue notifications. Either email or phone_number is required for
+    self-signed-up guests (not for manually entered/enqueued ones), so it can be NULL. An
+    @moma.org email marks the participant as staff for priority purposes.
+  phone_number: >
+    Phone number for SMS notifications, normalized to E.164 using phone_country_code (phony gem).
+    NULL when the guest chose email-only contact. If present, receive_sms must be true.
+  phone_country_code: >
+    ISO country code used to normalize phone_number (e.g. 'US'; app default 'US').
+  virtual_queue_id: >
+    FK -> virtual_queues.id; the queue this party is waiting in (belongs_to, required in the app
+    though the column is nullable in the schema).
+  slots: >
+    Party size — number of people in the group (1..6; MAX_ALLOWED_SLOTS = 6, default 1). Use
+    SUM(slots) for expected attendance; actual admitted headcount is admitted_count.
+  status: >
+    Lifecycle state (Rails string enum + AASM): 'queued' (waiting; initial state), 'notified'
+    (told it's their turn), 'visiting' (admitted/checked in), 'left' (departed after visiting),
+    'cancelled' (withdrew or removed by staff while queued/notified), 'unserved' (was still
+    queued/notified when the queue closed for the day — never admitted), 'sms_undeliverable' (SMS
+    notification could not be delivered while queued). Note the DB column default is the legacy
+    value 'waiting', but the app sets 'queued'; treat any 'waiting' rows as equivalent to queued.
+  priority: >
+    Numeric serving priority; higher is served sooner (queue orders by priority DESC, created_at
+    ASC). Assigned at creation from STARTING_PRIORITY: 20 = high (member with an active membership
+    account), 15 = medium_high (manually enqueued by staff), 10 = medium (MoMA staff), 0 = low
+    (general public). Each tier falls back to 0 when the queue has that priority feature disabled,
+    so 0 does not always mean general public.
+  uuid: >
+    Random UUID (STRING in BQ) assigned at creation; public opaque identifier used in
+    guest-facing URLs (status/confirmation pages) instead of the sequential id.
+  marketing_opt_in: >
+    Boolean; true = the guest opted in to marketing communications at signup. Default false.
+  user_id: >
+    Logical FK -> users.id; the membership-site account of the participant, if they were signed
+    in. NULL for anonymous guests (belongs_to optional). Used to detect active members for high
+    priority.
+  web_push_device_id: >
+    Logical FK -> web_push_devices.id; browser push-notification device registered for turn
+    notifications. NULL when the guest did not enable web push (optional association).
+  created_at: >
+    Timestamp the participant joined the queue (Rails-managed). Tiebreaker for serving order
+    within a priority tier, and the BigQuery partition key for the sync MERGE.
+  updated_at: >
+    Timestamp of last update (Rails-managed); drives the incremental sync watermark.
+  receive_sms: >
+    Boolean; true = the guest consented to receive SMS notifications. Must be true whenever
+    phone_number is present (validated). Default false.
+  notified_at: >
+    AASM transition timestamp: when status changed to 'notified' (guest told their turn is
+    ready). NULL if never notified. The guest then has virtual_queues.timeout_in_minutes to show
+    up.
+  visiting_at: >
+    AASM transition timestamp: when status changed to 'visiting' (party admitted / QR scanned).
+    NULL if never admitted.
+  admitted_count: >
+    Number of people actually admitted at check-in (staff can admit fewer than slots). Set on the
+    queued->notified->visiting 'visit' transition; NULL for rows that never reached 'visiting'.
+    Prefer this over slots for realized attendance.
+  cancelled_at: >
+    AASM transition timestamp: when status changed to 'cancelled' (guest withdrew or staff
+    cancelled while queued/notified). NULL otherwise.
+  unserved_at: >
+    AASM transition timestamp: when status changed to 'unserved' — the participant was still
+    queued/notified when the queue closed for the day and was never admitted. NULL otherwise.
+  properties: >
+    JSON grab-bag (jsonb) of operational metadata, accessed via Rails store_accessor. Known keys:
+    sms_history (array of send attempts incl. 'error' and 'error_type' of invalid_number /
+    region_blocked / send_failure), email_notifications, sms_notifications, cancelled_by_staff_id
+    (AdminUser id who cancelled), discarded, contact_id (Salesforce-side contact),
+    manually_enqueued and manually_entered (booleans marking staff-created rows). Query with JSON
+    functions, e.g. JSON_VALUE(properties, '$.manually_enqueued').

@@ -1,0 +1,17 @@
+table: >
+  Small lookup table of ticket type categories used to group ticket_types (e.g. for per-category
+  quantity limits and capacity handling on events — events reference categories through
+  events_ticket_type_categories). Grain: one row per category; name is unique. Admin-managed
+  configuration data, rarely changing; deletion blocked while ticket_types reference it. Synced
+  incrementally (upsert on id + created_at; rows never deleted from BQ).
+columns:
+  id: >
+    Primary key (INT64). Join target for ticket_types.ticket_type_category_id and
+    events_ticket_type_categories.ticket_type_category_id. Part of the pipeline MERGE key (id +
+    created_at).
+  name: >
+    Category display name. NOT NULL, unique.
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.

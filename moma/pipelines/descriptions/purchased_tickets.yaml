@@ -1,0 +1,72 @@
+table: >
+  Local mirror of tickets purchased through MoMA's EXTERNAL standalone ticketing service (a
+  separate internal API service on Heroku), which fronts general-admission/online/UNIQLO/film
+  ticket inventory. Rails model is TicketingServices::PurchasedTicket. Rows are upserted from the
+  service's order API responses (id and all attributes come from the service; on re-fetch only
+  status is updated) and exist locally mainly to back QR-code generation and door scanning
+  (Scannable) and lobby rebooking. Grain: one row per ticket issued by the external service.
+  IMPORTANT: event_id, ticket_type_id, order_id, external_id and template_id are the EXTERNAL
+  ticketing service's identifiers (all strings) — ticket_type_id does NOT join to the local
+  ticket_types table, and order_id joins to the service's order (stored on
+  line_items.properties->>'order_id' for online orders), not a local orders table. Synced
+  incrementally (upsert on id + created_at; never deleted from BQ).
+columns:
+  id: >
+    Primary key: UUID string assigned by the external ticketing service (not a local sequence).
+    Referenced (as text) by scannables.scannable_id with scannable_type =
+    'TicketingServices::PurchasedTicket'. Part of the pipeline MERGE key (id + created_at).
+  event_id: >
+    External ticketing-service event id (string). NOT the local events table. Nullable.
+  ticket_number: >
+    Human-readable ticket number issued by the external service (required by model validation);
+    used in refund descriptions. Nullable in DB.
+  barcode: >
+    Barcode string of the ticket as issued by the external service; scanned for admission. NOT
+    NULL.
+  ticket_type_id: >
+    External ticketing-service ticket-type id (string). Does NOT join to the local ticket_types
+    table; local Salesforce ticket products map to it via their ticket_vendor_id. Required by
+    model validation; nullable in DB.
+  external_id: >
+    Secondary external reference id from the ticketing service's ticket payload (string; e.g. the
+    upstream/vendor-side id). Nullable.
+  name: >
+    Ticket display name from the external service (e.g. 'Adult' — the model's ADULT constant keys
+    off this value). Required by model validation; nullable in DB.
+  price: >
+    Ticket price in integer US cents (the model computes price_in_dollars as price / 100.0).
+    Despite the bare name, this is cents, same convention as *_in_cents columns. Nullable in DB,
+    required by model validation.
+  date: >
+    Visit/event date of the ticket as a STRING in ISO 8601 'YYYY-MM-DD' format (compared against
+    Date.current.iso8601 for admission). Not a DATE/TIMESTAMP type — parse or compare as string.
+  status: >
+    Ticket status string from the external service. Known values (model constants): 'Normal'
+    (valid/live) and 'Refunded'. Only these two are referenced in code; treat other values as
+    unexpected.
+  order_id: >
+    External ticketing-service order id (string). Groups tickets of one service order; matches
+    line_items.properties->>'order_id' on online/kiosk ticket line items. NOT a local orders
+    table. Required by model validation; nullable in DB.
+  template_id: >
+    External ticketing-service ticket-template id (string). Nullable.
+  template_name: >
+    External ticketing-service template name (string). Known template values used by the app:
+    'mla_tickets', 'online_tickets', 'uniqlo_tickets', 'film_tickets'; only state these as the
+    observed vocabulary. Nullable.
+  created_at: >
+    Local row creation timestamp (UTC), i.e. when the ticket was first mirrored into this table.
+    Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last local modification timestamp (UTC), e.g. status refresh from the service or rebook
+    updates; drives the incremental sync watermark.
+  properties: >
+    JSON (jsonb in source) auxiliary payload column. No writer found in the current app code —
+    Likely legacy/rarely populated; expect NULL for most rows.
+  rebook_to_date: >
+    Target visit date for a lobby-initiated rebooking, as an ISO 8601 'YYYY-MM-DD' STRING (set when
+    staff rebook a ticket to another day; a ticket admits if date or rebook_to_date equals today).
+    NULL when no rebooking pending. Displayed instead of date until rebooking completes.
+  rebook_completed_at: >
+    Timestamp (UTC) when the rebooking finished — set when the old ticket is refunded and linked to
+    its replacement ticket. NULL if never rebooked or rebooking still pending.

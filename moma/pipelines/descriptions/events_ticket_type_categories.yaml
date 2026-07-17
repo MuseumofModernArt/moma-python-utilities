@@ -1,0 +1,29 @@
+table: >
+  Join/config table capping how many tickets of a given ticket-type category may be sold for an
+  event. Grain: one row per (event, ticket_type_category) pair (uniqueness validated per event in
+  the app). The app uses max_quantity here as an event-level cap per category (e.g. limit comp or
+  member-priced tickets), enforced alongside per-slot capacity and per-user limits. Like
+  event_time_slots, the Rails association is polymorphic (belongs_to :event, polymorphic): source
+  rows belong to an Event or an EventTemplate, and the Postgres discriminator column event_type
+  ('Event' / 'EventTemplate') plus an ignore_capacity flag exist in the source but are NOT synced
+  to this BigQuery table — joins of event_id to events.id may therefore include template rows.
+  Upsert-only incremental sync; source deletions are not propagated.
+columns:
+  id: >
+    Primary key of the join row (INT64). MERGE/upsert key for the sync.
+  event_id: >
+    Polymorphic foreign key (INT64, NOT NULL): events.id when the source row's (unsynced)
+    event_type is 'Event', otherwise an event_templates id ('EventTemplate'). Treat with the same
+    caution as event_time_slots.event_id when joining to events.
+  ticket_type_category_id: >
+    Foreign key -> ticket_type_categories.id (INT64, NOT NULL). The ticket-type category (grouping
+    of ticket_types) being capped for this event.
+  max_quantity: >
+    Maximum total tickets of this category sellable for the event (integer, NOT NULL). Remaining
+    allowance = max_quantity minus tickets already purchased in the category across the event's
+    time slots. The app auto-fills a 99999 sentinel (effectively unlimited) when the category is
+    set to ignore capacity.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL). Part of the sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.

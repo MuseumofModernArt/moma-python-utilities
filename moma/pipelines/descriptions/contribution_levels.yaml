@@ -1,0 +1,55 @@
+table: >
+  Purchase tiers (contribution/ticket levels) offered for a special event (galas, benefits — MoMA
+  fundraising events), managed in the special-events admin. Grain: one row per level per special
+  event (e.g. "Benefactor Table", "Individual Ticket", comp levels). Each level defines a dollar
+  price, tax-deductible portion, guest count per unit purchased, inventory and per-order caps, and
+  display ordering; special_event_tickets rows are stamped from it at reservation (name,
+  ticket_identifier, dollar_amount snapshotted). Deletion is blocked once purchased tickets exist.
+  Synced incrementally (upsert on id + created_at; rows never deleted from BQ).
+columns:
+  id: >
+    Primary key (INT64). Join target for special_event_tickets.contribution_level_id. Part of the
+    pipeline MERGE key (id + created_at).
+  special_event_id: >
+    Foreign key -> special_events.id (belongs_to, required by the model; column nullable in DB).
+    The special event this level belongs to.
+  name: >
+    Public display name of the level; snapshotted onto special_event_tickets.name at reservation.
+    Nullable in DB.
+  caption: >
+    Optional descriptive caption shown with the level on the purchase page. Nullable.
+  dollar_amount: >
+    Price of one unit of this level in whole US DOLLARS (integer; NOT cents — e.g. 2500 = $2,500).
+    Must be >= 0. Snapshotted onto special_event_tickets.dollar_amount (the first ticket of each
+    guest group carries the full amount; extra guest tickets get 0).
+  created_at: >
+    Row creation timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC); drives the incremental sync watermark.
+  quantity_limit: >
+    Total inventory cap: maximum number of tickets sellable at this level across all orders
+    (availability = quantity_limit - purchased/pledged - reserved). Must be > 0. Nullable in DB.
+  tax_deductible_dollar_amount: >
+    Tax-deductible portion of dollar_amount, in whole US DOLLARS (integer). Default 0, must be >=
+    0.
+  ticket_identifier: >
+    Short label for tickets at this level; snapshotted onto special_event_tickets.identifier at
+    reservation. Nullable.
+  visible: >
+    Boolean; true = level is shown/purchasable on the public special-event page. Default true.
+    Cannot be true together with comp (model validation).
+  number_of_guests: >
+    Integer number of guest tickets generated per unit purchased (e.g. a table of 10 => 10
+    special_event_tickets rows per purchased unit). Default 1, must be > 0.
+  display_order: >
+    Integer sort position of the level on the purchase page (must be > 0 per model validation).
+    NOT NULL, default 0.
+  order_quantity_limit: >
+    Per-order cap: maximum units of this level allowed in a single order. NULL = no per-order limit
+    (subject to remaining inventory).
+  comp: >
+    Boolean; true = complimentary level (comped tickets tracked separately from purchased counts;
+    not counted against paid totals). NOT NULL, default false; mutually exclusive with visible.
+  concierge_ticket: >
+    Boolean; true = concierge-handled ticket level — confirmation email content differs (guests
+    handled via concierge rather than standard ticket delivery). NOT NULL, default false.

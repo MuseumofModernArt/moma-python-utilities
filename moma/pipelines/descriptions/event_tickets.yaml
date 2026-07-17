@@ -1,0 +1,46 @@
+table: >
+  Individual admission tickets for timed ticketed events sold through the Rails app (one row per
+  ticket, per person, per time slot). Created as status 'reserved' when a cart's event-ticket line
+  item reserves inventory (name, identifier, price snapshotted from the ticket_type), then
+  transitions through the string status enum; a QR code Scannable is generated on purchase for
+  door scanning. Reserved rows for abandoned/changed carts are hard-deleted in the source app
+  (destroy on release) — but never deleted from BigQuery, so stale 'reserved' rows persist in BQ;
+  filter by status for sales analysis. Source rows also carry guest first/last name columns not
+  present in this BQ table. Synced incrementally (upsert on id + created_at).
+columns:
+  id: >
+    Primary key (INT64). Join target for event_tickets.rebooked_to_id (self-reference) and
+    referenced (as text) by scannables.scannable_id with scannable_type = 'EventTicket'. Part of
+    the pipeline MERGE key (id + created_at).
+  name: >
+    Snapshot of ticket_types.name at reservation time (e.g. 'Adult', 'Member'). NOT NULL.
+  price_in_cents: >
+    Price paid for this ticket in integer US cents, snapshotted from ticket_types.price_in_cents at
+    reservation. NOT NULL, default 0, >= 0.
+  identifier: >
+    Snapshot of ticket_types.ticket_identifier at reservation time. NOT NULL.
+  status: >
+    STRING-backed Rails enum; allowed values: 'reserved', 'purchased', 'refunding', 'refunded',
+    'rebooked'. 'Active' (counts as sold/holding capacity) = ('purchased', 'refunding');
+    'reserved' only holds capacity while its cart is open and unexpired. 'rebooked' means replaced
+    by another ticket (see rebooked_to_id). NOT NULL.
+  line_item_id: >
+    Foreign key -> line_items.id. NOT NULL. The cart/order line item this ticket belongs to; join
+    through line_items to carts for order status, purchaser, and payment.
+  ticket_type_id: >
+    Foreign key -> ticket_types.id. NOT NULL. The catalog ticket type this ticket was sold as
+    (current type attributes; name/identifier/price on this row are the at-sale snapshot).
+  created_at: >
+    Row creation (reservation) timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC), e.g. status transitions; drives the incremental sync
+    watermark.
+  event_time_slot_id: >
+    Foreign key -> event_time_slots.id. NOT NULL. The dated/timed slot this ticket admits to; join
+    through event_time_slots to events for the event itself.
+  user_id: >
+    Foreign key -> users.id. Nullable (guest checkout / anonymous sales have NULL). The logged-in
+    user who reserved/purchased the ticket.
+  rebooked_to_id: >
+    Foreign key -> event_tickets.id (self-reference). Nullable. When this ticket's status is
+    'rebooked', points to the replacement ticket issued for the new date/slot.

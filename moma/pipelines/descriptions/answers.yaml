@@ -1,0 +1,43 @@
+table: >
+  Questionnaire answers collected during checkout/registration: one row per answer given to
+  one question, usually attached to a line item (e.g. event registration questions asked when
+  buying event tickets). Rails STI table where `type` names the answer-widget kind. The row
+  snapshots the question wording (`question_text`) at answer time, so answers stay meaningful
+  even if the question is later edited or deleted. event_id and user_id are denormalized from
+  the owning line item at save time.
+columns:
+  id: >
+    Primary key (INT64). Sync MERGE key for this table.
+  question_id: >
+    Foreign key -> the questions table's id (nullable; belongs_to :question, optional).
+    Identifies which configured question was answered. NULL possible if the question record is
+    absent; question_text still preserves the wording.
+  line_item_id: >
+    Foreign key -> line_items.id (nullable). The cart line item (typically a ticket-order line
+    item) the answer was submitted with. Join to line_items -> carts for purchaser and order
+    context.
+  user_id: >
+    Foreign key -> users.id (nullable). The user who answered; copied automatically from the
+    line item when the line item exposes a user_id.
+  event_id: >
+    Foreign key -> events.id (nullable). The event the answered question belongs to; copied
+    automatically from the line item when it exposes an event_id. Use this to aggregate
+    answers per event.
+  type: >
+    STI discriminator: the answer-widget class. Exact values found in app/models/answers/:
+    'Answers::Checkbox' (single check; value '1' means checked), 'Answers::FreeText' (single
+    free-text response), 'Answers::SelectOne' (single choice validated against the question's
+    options list).
+  question_text: >
+    Snapshot of the question's plain-text wording at the time the answer was saved (NOT NULL).
+    Use this rather than joining questions when you need the wording as-asked.
+  values: >
+    The response(s), stored in BigQuery as ARRAY<STRING> (REPEATED mode — query with
+    UNNEST(values); a recent pipeline fix serializes the Postgres varchar[] through jsonb so
+    nested/quoted values survive intact). Usually 0 or 1 element (Checkbox/FreeText/SelectOne
+    all cap at one response); empty array means the (optional) question was left blank. Values
+    are stripped of whitespace and blanks removed on save.
+  created_at: >
+    Timestamp the answer was created. Also the sync MERGE partition column.
+  updated_at: >
+    Timestamp of the last update to the row.

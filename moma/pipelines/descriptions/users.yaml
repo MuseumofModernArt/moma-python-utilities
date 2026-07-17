@@ -1,0 +1,60 @@
+table: >
+  Public-facing member/visitor accounts for membership.moma.org (Rails model User). One row per
+  registered user account; grain is one account, enforced to at most one per Salesforce Contact
+  by application validation. This is the identity hub of the Users & auth cluster: it links the
+  web login identity to the Salesforce Contact (person) and Account (household/corporate
+  membership), and is the parent of login_methods (Auth0/OAuth identities) and
+  virtual_queue_participants. Rows are created at self-registration or by admins, updated on
+  profile/auth changes, and synced incrementally (upsert-only, never deleted) into BigQuery.
+columns:
+  id: >
+    INT64 primary key (Postgres bigserial). Join target for login_methods.user_id and
+    virtual_queue_participants.user_id.
+  active: >
+    BOOL, NOT NULL, default true. True means the account is active/enabled; false means the
+    account has been deactivated.
+  email: >
+    User's login/contact email address. Nullable; validated for email format when present.
+  uuid: >
+    Application-generated UUID assigned at record initialization; the stable external identifier
+    for the user. Used as the "external_reference" that Salesforce Customer/ECRM sync records
+    point back to, and as the join key for external_sync_logs. Prefer this over id for
+    cross-system identity.
+  created_at: >
+    Timestamp the account row was created (also the BigQuery partition/merge column for this
+    table).
+  updated_at: >
+    Timestamp the row was last modified in the source Postgres DB; drives the incremental sync.
+  first_name: >
+    User-entered first name. Nullable; in the app it is a fallback — the linked Salesforce
+    Contact's first name takes precedence when present, so this column may be stale or empty for
+    contact-linked users.
+  last_name: >
+    User-entered last name. Same fallback semantics as first_name: the Salesforce Contact's last
+    name wins in the application when present.
+  contact_id: >
+    STRING Salesforce join, nullable: FK -> sf.contact.sfid (the Salesforce Contact record id,
+    e.g. 003...). Primary link between the web account and the person record in Salesforce
+    (belongs_to :contact, primary_key: :sfid, optional). Not an integer FK.
+  fallback_contact_id: >
+    STRING Salesforce join, nullable: FK -> sf.contact.contact_external_id__c (the Contact's
+    external id custom field, NOT sfid). Secondary/fallback link used when contact_id is absent;
+    the app validates that contact_id and fallback_contact_id resolve to the same Contact when
+    both are set.
+  account_id: >
+    STRING Salesforce join, nullable: FK -> sf.account.sfid, specifically a CorporateAccount
+    (belongs_to :parent_account, class CorporateAccount, primary_key: :sfid, optional). Links
+    the user to their parent corporate Account for corporate-membership features.
+  fallback_account_id: >
+    STRING Salesforce join, nullable: FK -> sf.account.account_external_id__c (Account external
+    id custom field, NOT sfid). Fallback link to the parent CorporateAccount used when
+    account_id does not resolve.
+  external_reference: >
+    Nullable STRING, admin-editable free-form identifier. Likely a legacy external-system id for
+    the user; it is exposed only on the admin user form and not read by application logic (the
+    uuid column, not this, is what external systems reference).
+  last_authenticated_on: >
+    Nullable TIMESTAMP of the user's most recent authentication/login. NULL means the user has
+    never authenticated (or not since the column existed). The pipeline transports NULL as a
+    '3000-01-01' sentinel but converts it back, so the BigQuery destination stores real NULLs —
+    filter with IS NULL / IS NOT NULL as usual.

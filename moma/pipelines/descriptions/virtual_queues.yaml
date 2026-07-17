@@ -1,0 +1,46 @@
+table: >
+  A virtual (timed-entry) queue for a MoMA exhibition or experience, managed by the
+  membership/ticketing Rails app (membership.moma.org). One row per queue — typically one per
+  exhibition run, live across its opening/closing date range. Staff open, pause, and close the
+  queue daily from an admin console; visitors join it via a public signup page and are tracked in
+  virtual_queue_participants (child rows, virtual_queue_id FK). The source table also carries a
+  category column ('virtual' for public online queues, 'manual' for walk-up/staff-managed lines)
+  plus internal titles, rich-text page copy, and per-queue priority toggles, none of which are
+  synced to BigQuery.
+columns:
+  id: >
+    Primary key (bigint sequence). Referenced by virtual_queue_participants.virtual_queue_id.
+  display_title_public: >
+    Public-facing queue title shown to visitors on the signup and confirmation pages (usually the
+    exhibition name). Required in the app. Note: in Rails this is also exposed as a rich-text
+    (ActionText) attribute, so the plain column may lag the displayed copy; a separate
+    display_title_internal (staff-facing label) exists in the source but is not synced.
+  max_capacity: >
+    Maximum number of people the queue admits per day; staff-configured capacity target used when
+    releasing/notifying participants. Integer, defaults to 0, required in the app. Compare against
+    the sum of participants' slots/admitted_count, not row counts.
+  status: >
+    Current operational state of the queue (Rails string enum): 'open' (accepting new signups and
+    admitting), 'paused' (temporarily halted), 'paused_for_public_signup' (still accepts new
+    public signups but admission is paused), 'closed_for_the_day' (done admitting today; remaining
+    queued/notified participants get marked unserved), 'ended' (queue permanently finished, e.g.
+    exhibition closed). New guests are only accepted while 'open' or 'paused_for_public_signup'.
+    Reflects the state as of the last sync, not history.
+  created_at: >
+    Timestamp the queue record was created (Rails-managed). Also the BigQuery partition key used
+    by the sync pipeline's MERGE.
+  updated_at: >
+    Timestamp of the last update to the record (Rails-managed); drives the incremental sync
+    watermark.
+  slug: >
+    Short URL slug (max 10 chars) identifying the queue in public URLs, e.g. the signup page path.
+    Human-readable alternate key.
+  opening_date: >
+    First calendar date the queue operates (DATE in source; TIMESTAMP at midnight in BigQuery).
+    Required; must be <= closing_date.
+  closing_date: >
+    Last calendar date the queue operates. Required; validated to be on or after opening_date.
+    After this the queue is typically set to status 'ended'.
+  timeout_in_minutes: >
+    Number of minutes a notified participant has to arrive/check in after being notified before
+    their turn lapses. Required integer, configured per queue.

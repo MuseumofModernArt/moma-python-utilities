@@ -1,0 +1,44 @@
+table: >
+  Fundraising special events — benefits, galas, and similar Special Programming & Events
+  productions sold on membership.moma.org. One row per special event (grain: special_events.id).
+  SpecialEvent is a separate model from Event with a different sales structure: instead of price
+  lists and time slots, purchases are made through contribution_levels (tables/tickets at set
+  contribution amounts, -> contribution_levels.special_event_id) and optional donation levels,
+  producing special_event_tickets; pledge-based payment is supported. Event and SpecialEvent are
+  sibling "event" concepts that share polymorphic attachments in the source app, but
+  event_time_slots do NOT attach to SpecialEvent (their polymorphic targets are Event/
+  EventTemplate). The BigQuery table carries a small subset of the source columns. Archived when
+  start_date passes; sales stop at turn_off_date. Upsert-only sync.
+columns:
+  id: >
+    Primary key of the special event (INT64). MERGE/upsert key for the sync. Join target for
+    contribution_levels.special_event_id; also referenced from cart line_items' properties as
+    special_event_id in the source app.
+  slug: >
+    URL slug for the special event's public purchase page. Nullable in source; the app falls back
+    to "<id>-<parameterized title>" when blank, so NULL here does not mean the event has no URL.
+  salesforce_campaign: >
+    Salesforce Campaign identifier (STRING, Salesforce ID) that contributions/tickets for this
+    special event are attributed to in Salesforce. Nullable.
+  turn_off_date: >
+    TIMESTAMP after which online sales are shut off (over? is true once turn_off_date <= now).
+    Nullable; NULL means no automatic cutoff.
+  created_at: >
+    Row creation timestamp (TIMESTAMP, NOT NULL). Part of the sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.
+  emarsys_event_id: >
+    Key of the Emarsys external event used to trigger payment- and pledge-confirmation emails.
+    STRING; source default 'special_event_line_item'.
+  name: >
+    Internal/administrative name of the special event (STRING, NOT NULL in source). The public
+    page displays a separate title column (not synced) — use name as the human-readable
+    identifier here.
+  start_date: >
+    Date the special event takes place (DATE, nullable). Drives archiving (start_date < today =
+    archived; NULL start_date counts as active) and post-event processes such as abandoned-cart
+    cleanup ~90 days after.
+  start_time: >
+    Event start as a DATETIME: the pipeline combines source start_date + the time-of-day
+    start_time column, so this is the full start datetime, not a bare time. NULL when the source
+    time-of-day is NULL. Prefer this over start_date for the actual start moment.

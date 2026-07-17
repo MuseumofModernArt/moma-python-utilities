@@ -1,0 +1,49 @@
+table: >
+  Payment attempts/transactions for carts: one row per payment attempt (a cart can have
+  several — retries, split cash/check, etc.). Rails STI table: `type` names the payment
+  method subclass, which defines what lives in the JSON `properties` column. Lifecycle is an
+  AASM machine on `status`; the money actually taken for an order is the row(s) with
+  status = 'collected'. Refunds reference this table via refunds.payment_detail_id.
+columns:
+  id: >
+    Primary key (INT64). Join target for refunds.payment_detail_id and the sync MERGE key.
+  uuid: >
+    Payment transaction UUID (STRING, nullable). Set when the payment is collected — either
+    the payment provider's transaction id or an app-generated UUID (cash/check/deferred).
+    Serves as the external transaction / order number for the payment; NULL for attempts that
+    never completed.
+  type: >
+    STI discriminator: payment method class name, namespaced 'PaymentDetails::<Kind>'.
+    Concrete kinds found in app/models/payment_details/: 'PaymentDetails::Card' (in-person
+    terminal card), 'PaymentDetails::OnlineCard', 'PaymentDetails::ManualCard',
+    'PaymentDetails::AutomaticCard' (plus testing variants), 'PaymentDetails::ApplePay',
+    'PaymentDetails::GooglePay', 'PaymentDetails::Cash', 'PaymentDetails::Check',
+    'PaymentDetails::ZeroPayment' (free, $0 orders), 'PaymentDetails::DeferredPayment',
+    'PaymentDetails::ExternalPayment', 'PaymentDetails::BackendPaymentReceived',
+    'PaymentDetails::Redemption' (gift/voucher redemption), 'PaymentDetails::CardOnFileUpdate',
+    'PaymentDetails::CardSync'. 'PaymentDetails::Tokenizable' is the shared PSP-token base
+    class of the online/wallet kinds.
+  status: >
+    Payment lifecycle state (AASM). Exact allowed values: 'initial', 'pending', 'collected',
+    'cancelled', 'failed'. 'collected' means money was successfully taken — use
+    status = 'collected' to identify real payments; a completed order's amount is the latest
+    collected row per cart.
+  amount_in_cents: >
+    Amount of the payment in integer USD cents (currency is always USD in the app). Assigned
+    at collection; required once status is 'collected', may be NULL on attempts that never
+    collected.
+  cart_id: >
+    Foreign key -> carts.id (nullable). The cart this payment is for; a few backend payment
+    types don't require a cart, so NULL is possible but rare.
+  created_at: >
+    Timestamp the payment attempt was created. Also the sync MERGE partition column.
+  updated_at: >
+    Timestamp of the last update (AASM timestamps state transitions).
+  properties: >
+    JSON (jsonb, defaults to {}) of PSP/method-specific data via store_accessor; keys vary by
+    `type`. Tokenizable/online kinds store psp_reference, last_4_card_digits, card_brand,
+    result_code, refusal_reason, refusal_reason_code, merchant_reference, refundable, email,
+    first/last name, ip_address, etc.; terminal Card stores card_token, last_digits,
+    terminal_id, terminal_status, shopper_reference; Cash/Check/Redemption store payment_id.
+    'psp_reference' (JSON_VALUE(properties, '$.psp_reference')) is the payment provider's
+    transaction reference.

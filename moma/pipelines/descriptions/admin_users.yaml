@@ -1,0 +1,22 @@
+table: >
+  Staff / back-office operator accounts for the admin ("MLA") and lobby tools (Rails model
+  AdminUser). One row per staff member, keyed by unique email and authenticated via Google SSO
+  (and Auth0), with accounts auto-provisioned from an active Salesforce Referral on first login.
+  Authorization is role-based via rolify (roles such as mla_manager, mla_admin, mla_user,
+  kiosk_manager, event_manager, virtual_queue_manager, administrator, box_office_admin live in a
+  separate roles join table, not here). Distinct from public `users`; this table is the join
+  target for staff-attributed activity: carts.admin_user_id (admin-created orders),
+  scannable_events.admin_user_id, and gift_membership_batches.admin_user_id.
+columns:
+  id: >
+    INT64 primary key (Postgres bigserial). FK target of carts.admin_user_id,
+    scannable_events.admin_user_id, and gift_membership_batches.admin_user_id — join here to
+    attribute those rows to a staff member.
+  email: >
+    Staff email address, NOT NULL and unique; normalized to lowercase. Used as the SSO lookup key
+    (matched case-insensitively against the Google/Auth0 identity) and as the feature-flag
+    (flipper) id.
+  google_id: >
+    Google account identifier (the Google identity's user_id) captured at first Google SSO login;
+    nullable until the user first authenticates, then backfilled and used to verify subsequent
+    Google logins.

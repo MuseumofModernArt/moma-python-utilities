@@ -1,0 +1,48 @@
+table: >
+  Individual guest tickets for special events (galas/benefits), one row per seat/guest. Created in
+  bulk at reservation time from a contribution level (quantity x number_of_guests rows, with
+  name/identifier/dollar_amount snapshotted from the level) and attached to the purchasing cart's
+  line item. Lifecycle is driven by the status column: reserved while in an open cart, then
+  purchased (a QR code Scannable is generated for admission scanning), and possibly refunding/
+  refunded, expired, or pledged (pay-later pledge; pledged counts against inventory like
+  purchased). Source rows also carry guest name/email fields not present in this BQ table. Synced
+  incrementally via an INNER JOIN to contribution_levels (see special_event_id); rows never
+  deleted from BQ.
+columns:
+  id: >
+    Primary key (INT64). Referenced (as text) by scannables.scannable_id with scannable_type =
+    'SpecialEventTicket' for admission scans. Part of the pipeline MERGE key (id + created_at).
+  name: >
+    Snapshot of the contribution level's name at reservation time (e.g. tier name). Nullable.
+  dollar_amount: >
+    Amount attributed to this ticket in whole US DOLLARS (integer; NOT cents). Only the first
+    ticket of each purchased unit carries the level's full dollar_amount; the remaining
+    number_of_guests-1 tickets of that unit are 0. Multiply by 100 for cents (the app's refund
+    price does exactly this).
+  identifier: >
+    Snapshot of contribution_levels.ticket_identifier at reservation time. Nullable.
+  status: >
+    STRING in BigQuery. The source column is an integer-backed Rails enum, but the pipeline
+    converts it to string labels: 0 -> 'reserved', 1 -> 'purchased', 2 -> 'refunded', 3 ->
+    'refunding', 4 -> 'expired', 5 -> 'pledged', and any unmapped code -> 'unknown [n]'. Filter on
+    these STRING labels in BigQuery (filtering on integer codes returns nothing). "Refund
+    statuses" = ('refunded','refunding'); 'pledged' and 'purchased' both count as sold against the
+    level's quantity_limit.
+  contribution_level_id: >
+    Foreign key -> contribution_levels.id (belongs_to, required by the model; column nullable in
+    DB). The tier this ticket was sold under.
+  line_item_id: >
+    Foreign key -> line_items.id (belongs_to, required by the model; column nullable in DB). The
+    cart/order line item that reserved or purchased this ticket; join through line_items to carts
+    for order status and purchaser.
+  special_event_id: >
+    Foreign key -> special_events.id (nullable). DERIVED COLUMN: the source special_event_tickets
+    table has no special_event_id; the pipeline populates it from the ticket's contribution level
+    (contribution_levels.special_event_id) via an INNER JOIN, so it always equals
+    contribution_level.special_event_id. Because that join is INNER, a ticket whose
+    contribution_level row is missing will not sync into BigQuery at all.
+  created_at: >
+    Row creation (reservation) timestamp (UTC). Part of the pipeline MERGE key / partition window.
+  updated_at: >
+    Last modification timestamp (UTC), e.g. status transitions; drives the incremental sync
+    watermark.

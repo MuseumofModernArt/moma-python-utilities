@@ -1,0 +1,31 @@
+table: >
+  Request/response audit log of ticketing API calls, one row per logged HTTP call associated with an
+  order in MoMA's standalone ticketing microservice (e.g. calls the service makes to its downstream
+  provider during create/finalize/refund flows). Owned by the EXTERNAL ticketing service, not the
+  Rails app — no ActiveRecord model. In Postgres it lives in the ticketing schema as
+  ticketing.order_logs; in BigQuery the schema prefix is flattened into the table name
+  ticketing_order_logs. Declared FK: order_id -> ticketing_orders.id (many log rows per order).
+  Useful for debugging an order's history; not an analytics fact table.
+columns:
+  id: >
+    Primary key. UUID of the log entry, stored as STRING.
+  request_path: >
+    STRING, REQUIRED. The API endpoint path of the logged call. Filter on this to isolate a step in
+    the order lifecycle (the exact path vocabulary is defined by the external service and not
+    enumerated in the Rails repo).
+  request_body: >
+    STRING, REQUIRED. Raw request payload sent for this call. Likely JSON serialized as text — it is
+    stored as STRING (Postgres text), not JSON type, so use PARSE_JSON/JSON functions after
+    validating the content. May contain PII (purchaser details).
+  response_body: >
+    STRING, nullable. Raw response payload received for the call; NULL when no response was captured
+    (e.g. timeout/failure). Likely JSON serialized as text; same parsing caveat as request_body.
+  order_id: >
+    UUID stored as STRING, REQUIRED. Declared FK -> ticketing_orders.id: the order this API call
+    concerned. Join to ticketing_orders for order context.
+  created_at: >
+    TIMESTAMP. When the call was logged; MERGE partition key for the sync. For a log table this is
+    effectively the event time — order rows chronologically by it.
+  updated_at: >
+    TIMESTAMP. Last modification time; drives the incremental sync watermark. Log rows are Likely
+    immutable, so this normally equals created_at.

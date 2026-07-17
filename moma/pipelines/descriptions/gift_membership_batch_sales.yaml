@@ -1,0 +1,34 @@
+table: >
+  One row per sale of gift codes out of a gift_membership_batch through the MLA (in-lobby) checkout
+  — the join between a batch and the cart line item that paid for it. Created alongside a
+  LineItems::GiftMembershipBatchPurchase line item (has_one, as: :line_item, dependent: destroy);
+  the line item's quantity says how many codes from the batch were sold in that transaction, and
+  its finalized timestamp marks the sale as completed. The gift_giver_* columns denormalize the
+  purchaser's details from the line item's order attributes for search/reporting. Grain: one
+  batch-purchase line item.
+columns:
+  id: >
+    Primary key (INT64, BIGINT surrogate). Part of the BigQuery MERGE key (id + created_at).
+  gift_membership_batch_id: >
+    Foreign key -> gift_membership_batches.id (declared DB constraint): the batch whose codes were
+    sold. NOT NULL.
+  line_item_type: >
+    Polymorphic type half of the (line_item_type, line_item_id) pair: names the Rails model class
+    of the purchasing record so line_item_id knows which table/model it points at. NOT NULL. The
+    target is a LineItems::GiftMembershipBatchPurchase (STI subclass of LineItem), so Rails stores
+    the base class here (Likely 'LineItem') while the concrete subclass lives in line_items.type.
+  line_item_id: >
+    Polymorphic id half of the pair: foreign key -> line_items.id (no DB constraint), the
+    LineItems::GiftMembershipBatchPurchase line item that paid for the codes. NOT NULL. Join to
+    line_items on this column; the line item's quantity = number of gifts sold, finalized IS NOT
+    NULL = completed sale.
+  created_at: >
+    Row creation timestamp (Rails-managed, NOT NULL). Part of the BigQuery MERGE key.
+  updated_at: >
+    Last update timestamp (Rails-managed, NOT NULL); drives incremental sync.
+  gift_giver_first_name: >
+    Purchaser's first name, denormalized from the line item's order attributes. Nullable.
+  gift_giver_last_name: >
+    Purchaser's last name, denormalized from the line item's order attributes. Nullable.
+  gift_giver_email: >
+    Purchaser's email, denormalized from the line item's order attributes. Nullable.

@@ -1,0 +1,51 @@
+table: >
+  Shopping-cart / order header for MoMA's membership and ticketing checkout
+  (membership.moma.org Rails app). One row per cart: a single checkout session that groups
+  line_items (the products) and payment_details (the payment attempts). Created when a
+  visitor, kiosk, or admin/POS user starts a purchase; driven through an AASM state machine
+  on `status` to completion or abandonment. There are no amount columns on the cart itself —
+  cart totals are derived by summing line_items (amount_in_cents * quantity, or
+  discounted_total_in_cents). A cart that reached `finalized` or `delivered` represents a
+  completed order.
+columns:
+  id: >
+    Primary key (INT64). Join target for line_items.cart_id and payment_details.cart_id,
+    and the sync MERGE key for this table.
+  uuid: >
+    Application-generated UUID string, assigned at cart creation. Used as the external order
+    reference: it is the fallback order number / external transaction number when no
+    collected payment exists, and joins to Salesforce Heroku transaction records via their
+    reference id.
+  status: >
+    Cart lifecycle state (AASM). Exact allowed values: 'initial', 'pending', 'finalized',
+    'delivered', 'cancelled', 'failed', 'expired'. Flow: initial -> pending (checkout) ->
+    finalized (payment covers total) -> delivered (goods/tickets issued); cancel from
+    initial/pending; fail from pending; expire from initial/pending; cancelled/failed can
+    retry back to initial. Successful orders are status IN ('finalized','delivered');
+    in-progress are ('initial','pending').
+  contact_id: >
+    Salesforce join (STRING, nullable): the Salesforce Contact `sfid` of the purchaser
+    (belongs_to :contact, primary_key: :sfid). Join to Salesforce contact records on sfid.
+    NULL for anonymous/guest carts or when only the fallback external id is known.
+  fallback_contact_id: >
+    Salesforce join (STRING, nullable): alternate purchaser reference holding the contact's
+    external id (joins Salesforce Contact on `contact_external_id__c`, not sfid). The app
+    resolves the purchaser as contact_id first, then fallback_contact_id. NULL when unused.
+  created_at: >
+    Timestamp the cart row was created (checkout session start). Also the partition/window
+    column used by the sync MERGE.
+  updated_at: >
+    Timestamp of the last update to the cart row (AASM sets timestamps on state transitions,
+    so this tracks the latest status change).
+  admin_user_id: >
+    Foreign key -> admin_users.id (INT64, nullable). Set when the cart was created/operated
+    by a staff member in the admin or lobby/POS interface; NULL means a self-service cart
+    (online or kiosk). Non-NULL identifies staff-assisted sales.
+  account_id: >
+    Salesforce join (STRING, nullable): Salesforce Account `sfid` of the purchasing
+    account/organization (belongs_to :account, primary_key: :sfid). Used e.g. for corporate
+    memberships. NULL for individual purchases without an account link.
+  fallback_account_id: >
+    Salesforce join (STRING, nullable): alternate account reference holding the account's
+    external id (joins Salesforce Account on `account_external_id__c`). Resolved only when
+    account_id is NULL. NULL when unused.

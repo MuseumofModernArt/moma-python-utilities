@@ -1,0 +1,36 @@
+table: >
+  Scan log for QR codes: one row per scan/admission action performed against a scannable QR code,
+  typically recorded by front-of-house staff using the admin scanning tools. Grain: one row per
+  scan event (id). A row is created when a ticket/membership-card QR code is admitted; the app
+  derives first/last scan time and scan counts per scannable from this table, and "un-admitting" a
+  guest DELETES the corresponding rows in the source — because the BigQuery sync is upsert-only,
+  such deletions are NOT propagated, so BigQuery may retain scan rows that were revoked in the
+  source. party_size supports admitting a group on a single scan.
+columns:
+  id: >
+    Primary key of the scan event (INT64). MERGE/upsert key for the sync.
+  name: >
+    Scan action name (STRING, NOT NULL). The only value defined in code (ScannableEvent::NAMES) is
+    'admitted' — the guest was admitted on this scan.
+  admin_user_id: >
+    Foreign key -> admin_users.id (INT64, nullable; optional belongs_to). The staff admin who
+    performed the scan; NULL when no admin context was recorded.
+  scannable_id: >
+    Foreign key -> scannables.id (INT64, NOT NULL): the QR-code record that was scanned. NOTE:
+    despite the identical column name, this is a plain FK to the scannables table, NOT the
+    polymorphic scannables.scannable_id column. To reach the underlying ticket or card, join
+    scannable_events.scannable_id = scannables.id, then resolve scannables.scannable_type/
+    scannable_id.
+  created_at: >
+    Timestamp of the scan itself (TIMESTAMP, NOT NULL) — this is the scan time used for first/
+    last-scan statistics. Part of the sync MERGE window.
+  updated_at: >
+    Last modification timestamp (TIMESTAMP, NOT NULL); incremental-sync watermark column.
+  scan_mode: >
+    Context in which the code was scanned (STRING, nullable). Allowed values (SCAN_MODES in Event/
+    SpecialEvent models): 'event_admission' (admission to a specific event — the default) and
+    'museum_admission' (general museum entry, allowed for event tickets only when the event has
+    allow_museum_admission=true). A scannable can be admitted once per scan_mode.
+  party_size: >
+    Number of people admitted on this scan (INT64, NOT NULL, default 1). Sum this, not row counts,
+    to get admitted headcount.
