@@ -4,7 +4,7 @@ import typing
 
 import moma.pipelines as pl
 
-class TicketBucketTicket(typing.NamedTuple):
+class TicketBucketTicket:
     class Record(typing.NamedTuple):
         id: int
         bucket_name: str
@@ -69,34 +69,36 @@ class TicketBucketTicket(typing.NamedTuple):
                 to_char(created_at, 'YYYY-MM-DD HH24:MI:SS"."US') as created_at,
                 to_char(updated_at, 'YYYY-MM-DD HH24:MI:SS"."US') as updated_at,
                 admission_value,
-                child_ticket,
-                disables_upsell,
-                adult,
-                require_adult,
-                care_partner,
-                permit_care_partner,
-                member,
-                require_member,
-                staff,
-                require_staff,
-                student_ticket
+                child_ticket::text,
+                disables_upsell::text,
+                adult::text,
+                require_adult::text,
+                care_partner::text,
+                permit_care_partner::text,
+                member::text,
+                require_member::text,
+                staff::text,
+                require_staff::text,
+                student_ticket::text
             FROM ticket_bucket_tickets
             WHERE updated_at >= timestamp '{begin.isoformat()}';
         """
 
     def to_dict(row):
-        row['child_ticket'] = row['child_ticket'] == 'true'
-        row['disables_upsell'] = row['disables_upsell'] == 'true'
-        row['adult'] = row['adult'] == 'true'
-        row['require_adult'] = row['require_adult'] == 'true'
-        row['care_partner'] = row['care_partner'] == 'true'
-        row['permit_care_partner'] = row['permit_care_partner'] == 'true'
-        row['member'] = row['member'] == 'true'
-        row['require_member'] = row['require_member'] == 'true'
-        row['staff'] = row['staff'] == 'true'
-        row['require_staff'] = row['require_staff'] == 'true'
-        row['student_ticket'] = row['student_ticket'] == 'true'
-        return row._asdict()
+        d = row._asdict()
+        d['child_ticket'] = d['child_ticket'] == 'true'
+        d['disables_upsell'] = d['disables_upsell'] == 'true'
+        d['adult'] = d['adult'] == 'true'
+        d['require_adult'] = d['require_adult'] == 'true'
+        d['care_partner'] = d['care_partner'] == 'true'
+        d['permit_care_partner'] = d['permit_care_partner'] == 'true'
+        d['member'] = d['member'] == 'true'
+        d['require_member'] = d['require_member'] == 'true'
+        d['staff'] = d['staff'] == 'true'
+        d['require_staff'] = d['require_staff'] == 'true'
+        d['student_ticket'] = d['student_ticket'] == 'true'
+
+        return d
 
 run = pl.make_runner(TicketBucketTicket)
 
