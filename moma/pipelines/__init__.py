@@ -359,3 +359,6 @@ if __name__ == '__main__':
         case "answers":
             syncanswers = importlib.import_module('moma.pipelines.syncanswers')
             make_runner(syncanswers.Answer)()
+        case "ticket_bucket_tickets":
+            syncticketbuckettickets = importlib.import_module('moma.pipelines.syncticketbuckettickets')
+            make_runner(syncticketbuckettickets.TicketBucketTicket)()
